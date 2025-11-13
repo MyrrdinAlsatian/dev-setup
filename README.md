@@ -1,2 +1,353 @@
-# dev-setup
-repo to automatise
+# Dev Environment Setup
+
+**Multi-OS Development Environment Automation Agent**
+
+Automate the setup of your development environment across Linux, macOS, Windows, and remote servers. This tool generates clean, modular, and well-documented Bash/PowerShell scripts that configure essential development tools and manage dotfiles.
+
+## Features
+
+✨ **Multi-OS Support**
+- Linux (Ubuntu, Debian, Fedora, RHEL, CentOS, Arch, Alpine)
+- macOS
+- Windows (via PowerShell)
+- Remote deployment via SSH/SCP
+
+🛠️ **Tool Installation & Configuration**
+- Git with sensible defaults and aliases
+- Docker (Docker Desktop on Windows/macOS, Docker Engine on Linux)
+- NVM (Node Version Manager) with LTS Node.js
+- Tmux with optimized configuration
+- Starship cross-shell prompt
+
+📁 **Dotfiles Management**
+- GNU Stow integration for symlink-based dotfiles (Linux/macOS)
+- Git-based dotfiles repository synchronization
+- Automatic backup of existing configurations
+- Safe conflict resolution
+
+🔐 **Security & Best Practices**
+- Robust error handling
+- Prerequisite verification
+- Package manager detection
+- Non-destructive operations with backups
+
+📊 **Developer Experience**
+- Colored, informative logging
+- Clear progress indicators
+- Interactive confirmations
+- Dry-run mode for testing
+- Modular, maintainable code
+
+## Quick Start
+
+### Linux / macOS
+
+```bash
+# Clone the repository
+git clone https://github.com/MyrrdinAlsatian/dev-setup.git
+cd dev-setup
+
+# Make the script executable
+chmod +x setup.sh
+
+# Run the setup
+./setup.sh
+```
+
+### Windows (PowerShell)
+
+```powershell
+# Clone the repository
+git clone https://github.com/MyrrdinAlsatian/dev-setup.git
+cd dev-setup
+
+# Run as Administrator
+.\setup.ps1
+```
+
+### Remote Deployment
+
+```bash
+# Deploy to a remote server via SSH
+./setup.sh --remote user@hostname
+```
+
+## Usage
+
+### Basic Usage
+
+```bash
+# Full setup with defaults
+./setup.sh
+
+# Dry run (see what would be done)
+./setup.sh --dry-run
+
+# Skip specific components
+./setup.sh --skip-tools
+./setup.sh --skip-dotfiles
+
+# Use custom configuration
+./setup.sh --config my-config.conf
+```
+
+### Advanced Options
+
+```
+Options:
+    --help              Show help message
+    --remote HOST       Deploy to remote host via SSH
+    --config FILE       Use custom configuration file
+    --dry-run           Show what would be done without executing
+    --skip-tools        Skip tool installation
+    --skip-dotfiles     Skip dotfiles configuration
+```
+
+## Project Structure
+
+```
+dev-setup/
+├── setup.sh                    # Main setup script (Unix)
+├── setup.ps1                   # Main setup script (Windows)
+├── scripts/
+│   ├── lib/                    # Core libraries
+│   │   ├── logger.sh           # Colored logging functions
+│   │   ├── logger.ps1          # PowerShell logging functions
+│   │   ├── os_detect.sh        # OS detection
+│   │   ├── os_detect.ps1       # PowerShell OS detection
+│   │   ├── utils.sh            # Utility functions
+│   │   └── utils.ps1           # PowerShell utilities
+│   └── modules/                # Installation modules
+│       ├── prerequisites.sh    # Prerequisite checks
+│       ├── git.sh              # Git installation & config
+│       ├── docker.sh           # Docker installation
+│       ├── nvm.sh              # NVM installation
+│       ├── tmux.sh             # Tmux installation & config
+│       ├── starship.sh         # Starship prompt installation
+│       ├── dotfiles.sh         # Dotfiles management
+│       └── *.ps1               # PowerShell equivalents
+├── config/
+│   └── default.conf            # Default configuration
+└── README.md                   # This file
+```
+
+## Configuration
+
+Create a custom configuration file to override defaults:
+
+```bash
+# config/my-config.conf
+DOTFILES_REPO="https://github.com/yourusername/dotfiles.git"
+INSTALL_GIT=true
+INSTALL_DOCKER=true
+INSTALL_NVM=true
+INSTALL_TMUX=true
+INSTALL_STARSHIP=true
+SETUP_DOTFILES=true
+```
+
+Then use it:
+
+```bash
+./setup.sh --config config/my-config.conf
+```
+
+## Dotfiles Setup
+
+This tool integrates with GNU Stow for managing dotfiles on Linux/macOS. Structure your dotfiles repository like this:
+
+```
+dotfiles/
+├── bash/
+│   └── .bashrc
+├── git/
+│   └── .gitconfig
+├── vim/
+│   └── .vimrc
+└── tmux/
+    └── .tmux.conf
+```
+
+The setup script will:
+1. Clone your dotfiles repository to `~/.dotfiles`
+2. Ask which packages to install
+3. Use GNU Stow to create symlinks
+4. Backup any existing files
+
+### Windows Dotfiles
+
+For Windows, structure your repository with a `windows/` directory:
+
+```
+dotfiles/
+├── windows/
+│   └── .config/
+│       └── starship.toml
+└── powershell/
+    └── Microsoft.PowerShell_profile.ps1
+```
+
+## Installed Tools
+
+### Git
+- Latest version from official repositories
+- Configured with useful aliases
+- Credential helpers for each OS
+- Default branch set to `main`
+
+### Docker
+- Docker Engine on Linux
+- Docker Desktop on macOS/Windows
+- Automatic permission configuration on Linux
+- Compose plugin included
+
+### NVM (Node Version Manager)
+- Latest version
+- Automatic LTS Node.js installation
+- Shell integration
+
+### Tmux (Linux/macOS only)
+- Terminal multiplexer
+- Customized configuration with:
+  - Mouse support
+  - Better key bindings
+  - Custom status bar
+  - Vim-friendly settings
+
+### Starship
+- Fast, cross-shell prompt
+- Nerd Font icons
+- Git status integration
+- Custom configuration
+
+## Requirements
+
+### Linux
+- `bash` 4.0+
+- `curl` or `wget`
+- `git`
+- `sudo` access (for system packages)
+
+### macOS
+- Homebrew (will be installed if missing)
+- Xcode Command Line Tools
+
+### Windows
+- PowerShell 5.1+ or PowerShell Core 7+
+- Administrator privileges
+- Chocolatey or Winget (will be installed if missing)
+
+## Security Considerations
+
+- Scripts use `set -euo pipefail` for robust error handling
+- No hardcoded credentials
+- All external downloads use HTTPS
+- Existing files are backed up before modification
+- User confirmation required for destructive operations
+
+## Troubleshooting
+
+### Permission Errors
+
+```bash
+# Linux/macOS - ensure script is executable
+chmod +x setup.sh
+
+# Windows - run PowerShell as Administrator
+```
+
+### SSH Remote Deployment Issues
+
+```bash
+# Ensure SSH key authentication is set up
+ssh-copy-id user@hostname
+
+# Test SSH connection
+ssh user@hostname
+```
+
+### Docker Permission Issues (Linux)
+
+After installation, you may need to:
+```bash
+# Re-login or run:
+newgrp docker
+
+# Or restart your system
+```
+
+### Path Not Updated
+
+After installation, restart your shell or run:
+```bash
+# Linux/macOS
+source ~/.bashrc  # or ~/.zshrc
+
+# Windows (PowerShell)
+# Restart PowerShell session
+```
+
+## Development
+
+### Adding New Tools
+
+1. Create a new module in `scripts/modules/`
+2. Follow the existing module pattern
+3. Add installation function
+4. Add configuration function
+5. Source the module in `setup.sh`
+
+Example module structure:
+
+```bash
+#!/usr/bin/env bash
+
+install_mytool() {
+    if command_exists mytool; then
+        log_success "MyTool is already installed"
+        return 0
+    fi
+    
+    log_step "Installing MyTool..."
+    
+    # Installation logic here
+    
+    log_success "MyTool installed successfully"
+}
+```
+
+### Testing
+
+```bash
+# Test with dry-run mode
+./setup.sh --dry-run
+
+# Test specific components
+./setup.sh --skip-dotfiles
+./setup.sh --skip-tools
+```
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## License
+
+This project is open source and available under the MIT License.
+
+## Acknowledgments
+
+- [GNU Stow](https://www.gnu.org/software/stow/) for dotfiles management
+- [Starship](https://starship.rs/) for the amazing prompt
+- [NVM](https://github.com/nvm-sh/nvm) for Node.js version management
+- The open-source community for inspiration and tools
+
+## Support
+
+For issues, questions, or suggestions, please [open an issue](https://github.com/MyrrdinAlsatian/dev-setup/issues) on GitHub.

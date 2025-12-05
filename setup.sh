@@ -153,6 +153,9 @@ main() {
     log_info "Operating System: ${OS_TYPE}"
     log_info "Distribution: ${OS_DISTRO}"
     log_info "Architecture: ${OS_ARCH}"
+    if is_wsl; then
+        log_info "Environment: WSL (Windows Subsystem for Linux)"
+    fi
     
     # Load configuration
     log_section "Configuration"

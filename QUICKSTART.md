@@ -20,6 +20,16 @@ cd dev-setup
 .\setup.ps1
 ```
 
+### WSL (Windows Subsystem for Linux)
+
+```bash
+# Same as Linux - WSL is auto-detected
+git clone https://github.com/MyrrdinAlsatian/dev-setup.git
+cd dev-setup
+chmod +x setup.sh
+./setup.sh
+```
+
 ## Common Commands
 
 ```bash
@@ -43,15 +53,15 @@ cd dev-setup
 
 ## What Gets Installed
 
-| Tool | Linux | macOS | Windows | Purpose |
-|------|-------|-------|---------|---------|
-| Git | ✅ | ✅ | ✅ | Version control |
-| Docker | ✅ | ✅ | ✅ | Containerization |
-| NVM | ✅ | ✅ | ✅ | Node.js version manager |
-| Node.js | ✅ | ✅ | ✅ | JavaScript runtime |
-| Tmux | ✅ | ✅ | ❌ | Terminal multiplexer |
-| Starship | ✅ | ✅ | ✅ | Cross-shell prompt |
-| GNU Stow | ✅ | ✅ | ❌ | Dotfiles manager |
+| Tool | Linux | macOS | Windows | WSL | Purpose |
+|------|-------|-------|---------|-----|---------|
+| Git | ✅ | ✅ | ✅ | ✅ | Version control |
+| Docker | ✅ | ✅ | ✅ | ✅ | Containerization |
+| NVM | ✅ | ✅ | ✅ | ✅ | Node.js version manager |
+| Node.js | ✅ | ✅ | ✅ | ✅ | JavaScript runtime |
+| Tmux | ✅ | ✅ | ❌ | ✅ | Terminal multiplexer |
+| Starship | ✅ | ✅ | ✅ | ✅ | Cross-shell prompt |
+| GNU Stow | ✅ | ✅ | ❌ | ✅ | Dotfiles manager |
 
 ## Configuration
 

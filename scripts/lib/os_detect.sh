@@ -11,6 +11,7 @@ OS_DISTRO=""
 OS_VERSION=""
 OS_ARCH=""
 PACKAGE_MANAGER=""
+IS_WSL=false
 
 ################################################################################
 # Detect the operating system
@@ -23,6 +24,7 @@ detect_os() {
     if [[ "$OSTYPE" == "linux-gnu"* ]]; then
         OS_TYPE="linux"
         detect_linux_distro
+        detect_wsl
     elif [[ "$OSTYPE" == "darwin"* ]]; then
         OS_TYPE="macos"
         OS_DISTRO="darwin"
@@ -37,7 +39,7 @@ detect_os() {
         OS_DISTRO="unknown"
     fi
     
-    export OS_TYPE OS_DISTRO OS_VERSION OS_ARCH PACKAGE_MANAGER
+    export OS_TYPE OS_DISTRO OS_VERSION OS_ARCH PACKAGE_MANAGER IS_WSL
 }
 
 ################################################################################
@@ -84,6 +86,33 @@ detect_linux_distro() {
 }
 
 ################################################################################
+# Detect if running under WSL (Windows Subsystem for Linux)
+################################################################################
+detect_wsl() {
+    IS_WSL=false
+    
+    # Method 1: Check /proc/version for Microsoft/WSL
+    if [[ -f /proc/version ]] && grep -qi "microsoft\|wsl" /proc/version 2>/dev/null; then
+        IS_WSL=true
+        return 0
+    fi
+    
+    # Method 2: Check uname -r for microsoft
+    if uname -r | grep -qi "microsoft" 2>/dev/null; then
+        IS_WSL=true
+        return 0
+    fi
+    
+    # Method 3: Check for WSL-specific environment variable
+    if [[ -n "${WSL_DISTRO_NAME:-}" ]] || [[ -n "${WSL_INTEROP:-}" ]]; then
+        IS_WSL=true
+        return 0
+    fi
+    
+    return 1
+}
+
+################################################################################
 # Check if running on Linux
 ################################################################################
 is_linux() {
@@ -102,6 +131,13 @@ is_macos() {
 ################################################################################
 is_windows() {
     [[ "${OS_TYPE}" == "windows" ]]
+}
+
+################################################################################
+# Check if running on WSL (Windows Subsystem for Linux)
+################################################################################
+is_wsl() {
+    [[ "${IS_WSL}" == true ]]
 }
 
 ################################################################################

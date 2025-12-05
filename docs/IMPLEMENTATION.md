@@ -10,6 +10,7 @@ This repository implements a comprehensive multi-OS development environment auto
 - **Linux**: Ubuntu, Debian, Fedora, RHEL, CentOS, Arch, Alpine
 - **macOS**: Full Homebrew integration
 - **Windows**: PowerShell with Chocolatey/Winget support
+- **WSL**: Windows Subsystem for Linux (auto-detected)
 - **Remote**: SSH/SCP deployment to remote servers
 
 ### ✅ Clean, Modular Code

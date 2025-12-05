@@ -10,6 +10,7 @@ Automate the setup of your development environment across Linux, macOS, Windows,
 - Linux (Ubuntu, Debian, Fedora, RHEL, CentOS, Arch, Alpine)
 - macOS
 - Windows (via PowerShell)
+- WSL (Windows Subsystem for Linux)
 - Remote deployment via SSH/SCP
 
 🛠️ **Tool Installation & Configuration**
@@ -64,6 +65,23 @@ cd dev-setup
 # Run as Administrator
 .\setup.ps1
 ```
+
+### WSL (Windows Subsystem for Linux)
+
+```bash
+# WSL is detected automatically and works like Linux
+# Clone the repository
+git clone https://github.com/MyrrdinAlsatian/dev-setup.git
+cd dev-setup
+
+# Make the script executable
+chmod +x setup.sh
+
+# Run the setup
+./setup.sh
+```
+
+**Note**: On WSL, the script will detect that it's running under Windows Subsystem for Linux and display this information during setup. All Linux-based tools work normally in WSL.
 
 ### Remote Deployment
 

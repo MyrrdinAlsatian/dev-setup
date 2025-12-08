@@ -146,6 +146,7 @@ dev-setup/
 │       ├── tmux.sh             # Tmux installation & config
 │       ├── starship.sh         # Starship prompt installation
 │       ├── optional_tools.sh   # Optional development tools
+│       ├── uv_tools.sh         # UV CLI tools (specify-cli)
 │       ├── dotfiles.sh         # Dotfiles management
 │       └── *.ps1               # PowerShell equivalents
 ├── config/
@@ -292,6 +293,43 @@ The setup includes optional but recommended development tools for enhanced produ
   - Includes `psql`, `pg_dump`, and other PostgreSQL utilities
 
 **Note**: All optional tools prompt for installation individually. You can skip any tool by declining the prompt or disable all optional tools by setting `INSTALL_OPTIONAL_TOOLS=false` in your configuration file.
+
+### UV CLI Tools
+
+The setup includes automatic installation of development CLI tools via [uv](https://github.com/astral-sh/uv), a fast Python package and tool installer.
+
+#### Prerequisites
+
+The uv tool must be installed manually on your system before the setup can install CLI tools. To install uv, follow the instructions at:
+- **Installation**: https://github.com/astral-sh/uv
+
+**Important**: The setup scripts do NOT automatically install uv itself. You must install it manually first.
+
+#### Installed Tools
+
+- **specify-cli**: CLI tool from the [github/spec-kit](https://github.com/github/spec-kit) repository
+  - Command executed: `uv tool install specify-cli --from git+https://github.com/github/spec-kit.git`
+  - Used for working with specification files and documentation
+
+#### Behavior
+
+- If `uv` is not installed, the setup will skip this step with a clear message and instructions
+- The installation is non-fatal: the setup continues even if uv is not available
+- If `specify-cli` is already installed, the command will handle it gracefully
+- Safe to run multiple times (idempotent)
+
+#### Manual Installation
+
+If you prefer to install specify-cli manually after the setup completes:
+
+```bash
+# Install uv first (if not already installed)
+# Visit: https://github.com/astral-sh/uv
+
+# Then install specify-cli
+uv tool install specify-cli --from git+https://github.com/github/spec-kit.git
+```
+
 
 ### SSH and GPG Keys Setup
 - Interactive script for generating SSH and GPG keys

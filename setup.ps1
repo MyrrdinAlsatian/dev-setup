@@ -155,6 +155,10 @@ function Main {
         
         . (Join-Path $ModulesDir "starship.ps1")
         Install-Starship
+        
+        # Install UV CLI tools
+        . (Join-Path $ModulesDir "uv_tools.ps1")
+        Install-UvCliTools
     } else {
         Write-LogInfo "Skipping tool installation (-SkipTools)"
     }

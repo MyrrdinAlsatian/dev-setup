@@ -142,11 +142,12 @@ install_yq() {
     
     log_step "Installing yq..."
     
+    local yq_release_version="v4.40.5"
+    
     if is_macos; then
         brew install yq
     elif is_linux; then
         # Install the Go-based yq (mikefarah/yq) via binary download
-        local yq_version="v4.40.5"
         local arch
         case "${OS_ARCH}" in
             x86_64)
@@ -161,7 +162,7 @@ install_yq() {
                 ;;
         esac
         
-        local yq_url="https://github.com/mikefarah/yq/releases/download/${yq_version}/yq_linux_${arch}"
+        local yq_url="https://github.com/mikefarah/yq/releases/download/${yq_release_version}/yq_linux_${arch}"
         
         log_info "Downloading yq..."
         if command_exists curl; then
@@ -345,6 +346,8 @@ install_mkcert() {
     
     log_step "Installing mkcert..."
     
+    local mkcert_version="v1.4.4"
+    
     if is_macos; then
         brew install mkcert
         brew install nss  # For Firefox support
@@ -355,7 +358,6 @@ install_mkcert() {
                 install_package "libnss3-tools"
                 
                 # Download and install mkcert binary
-                local mkcert_version="v1.4.4"
                 local arch
                 case "${OS_ARCH}" in
                     x86_64)
@@ -386,10 +388,33 @@ install_mkcert() {
                 ;;
             dnf|yum)
                 install_package "nss-tools"
-                # Use similar binary download as apt
-                local mkcert_version="v1.4.4"
-                local mkcert_url="https://github.com/FiloSottile/mkcert/releases/download/${mkcert_version}/mkcert-${mkcert_version}-linux-amd64"
-                run_as_root sh -c "curl -fsSL '${mkcert_url}' -o /usr/local/bin/mkcert && chmod +x /usr/local/bin/mkcert"
+                
+                # Detect architecture for dnf/yum
+                local arch
+                case "${OS_ARCH}" in
+                    x86_64)
+                        arch="amd64"
+                        ;;
+                    aarch64|arm64)
+                        arch="arm64"
+                        ;;
+                    *)
+                        log_error "Unsupported architecture for mkcert: ${OS_ARCH}"
+                        return 1
+                        ;;
+                esac
+                
+                local mkcert_url="https://github.com/FiloSottile/mkcert/releases/download/${mkcert_version}/mkcert-${mkcert_version}-linux-${arch}"
+                
+                # Add curl/wget fallback
+                if command_exists curl; then
+                    run_as_root sh -c "curl -fsSL '${mkcert_url}' -o /usr/local/bin/mkcert && chmod +x /usr/local/bin/mkcert"
+                elif command_exists wget; then
+                    run_as_root sh -c "wget -q '${mkcert_url}' -O /usr/local/bin/mkcert && chmod +x /usr/local/bin/mkcert"
+                else
+                    log_error "Neither curl nor wget found"
+                    return 1
+                fi
                 ;;
             pacman)
                 install_package "mkcert"

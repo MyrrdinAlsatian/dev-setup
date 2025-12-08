@@ -120,3 +120,55 @@ die() {
     log_error "${message}"
     exit "${exit_code}"
 }
+
+################################################################################
+# Array to track failed operations
+################################################################################
+declare -a FAILED_OPERATIONS=()
+
+################################################################################
+# Track a failed operation
+# Arguments:
+#   $1 - Operation name (e.g., "Git installation")
+#   $2 - Error message (optional)
+################################################################################
+track_failure() {
+    local operation="$1"
+    local error_msg="${2:-}"
+    
+    if [[ -n "${error_msg}" ]]; then
+        FAILED_OPERATIONS+=("${operation}: ${error_msg}")
+    else
+        FAILED_OPERATIONS+=("${operation}")
+    fi
+}
+
+################################################################################
+# Print summary of failed operations
+################################################################################
+print_failure_summary() {
+    if [[ ${#FAILED_OPERATIONS[@]} -eq 0 ]]; then
+        return 0
+    fi
+    
+    echo ""
+    print_color "${COLOR_BOLD}${COLOR_YELLOW}" "╔═══════════════════════════════════════════════════════════════╗"
+    print_color "${COLOR_BOLD}${COLOR_YELLOW}" "║                  Installation Summary                         ║"
+    print_color "${COLOR_BOLD}${COLOR_YELLOW}" "╚═══════════════════════════════════════════════════════════════╝"
+    echo ""
+    log_warning "The following operations encountered errors:"
+    echo ""
+    
+    local i=1
+    for failure in "${FAILED_OPERATIONS[@]}"; do
+        print_color "${COLOR_YELLOW}" "  ${i}. ${failure}"
+        ((i++))
+    done
+    
+    echo ""
+    log_info "The setup continued despite these errors. You may need to:"
+    log_info "  - Review the error messages above"
+    log_info "  - Manually install failed tools"
+    log_info "  - Re-run the setup script to retry"
+    echo ""
+}

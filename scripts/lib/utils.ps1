@@ -67,6 +67,78 @@ function Backup-Item {
 }
 
 ################################################################################
+# Prompt user for action when config file exists
+################################################################################
+function Prompt-ConfigOverwrite {
+    param(
+        [string]$ConfigFile,
+        [string]$Description
+    )
+    
+    if (-not (Test-Path $ConfigFile)) {
+        return 0  # File doesn't exist, safe to create
+    }
+    
+    Write-LogWarning "$Description already exists at: $ConfigFile"
+    Write-LogInfo "Options:"
+    Write-LogInfo "  1) Backup existing and create new (recommended)"
+    Write-LogInfo "  2) Skip (keep existing)"
+    Write-LogInfo "  3) Overwrite without backup (not recommended)"
+    Write-Host ""
+    
+    $choice = Read-Host "Choose an option [1/2/3]"
+    
+    switch ($choice) {
+        "1" {
+            Backup-Item $ConfigFile
+            return 0
+        }
+        "2" {
+            Write-LogWarning "Skipping $Description"
+            return 1
+        }
+        "3" {
+            Write-LogWarning "Proceeding without backup..."
+            return 2
+        }
+        default {
+            Write-LogError "Invalid option. Skipping $Description"
+            return 1
+        }
+    }
+}
+
+################################################################################
+# Safe write to config file with backup prompt
+################################################################################
+function Safe-WriteConfig {
+    param(
+        [string]$ConfigFile,
+        [string]$Description,
+        [string]$Content
+    )
+    
+    # Prompt if file exists
+    $result = Prompt-ConfigOverwrite $ConfigFile $Description
+    if ($result -eq 1) {
+        return $false
+    }
+    
+    # Create parent directory if needed
+    $parentDir = Split-Path $ConfigFile -Parent
+    if ($parentDir) {
+        Ensure-Directory $parentDir
+    }
+    
+    # Write content
+    $Content | Out-File -FilePath $ConfigFile -Encoding utf8
+    
+    Write-LogSuccess "$Description created at: $ConfigFile"
+    return $true
+}
+
+
+################################################################################
 # Download a file
 ################################################################################
 function Download-File {

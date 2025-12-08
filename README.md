@@ -246,12 +246,14 @@ dotfiles/
   - Better key bindings
   - Custom status bar
   - Vim-friendly settings
+- **Safe installation**: Prompts before overwriting existing `~/.tmux.conf`
 
 ### Starship
 - Fast, cross-shell prompt
 - Nerd Font icons
 - Git status integration
 - Custom configuration
+- **Safe installation**: Prompts before overwriting existing `~/.config/starship.toml`
 
 ## Requirements
 
@@ -275,7 +277,9 @@ dotfiles/
 - Scripts use `set -euo pipefail` for robust error handling
 - No hardcoded credentials
 - All external downloads use HTTPS
-- Existing files are backed up before modification
+- **Configuration Protection**: All modules detect existing configuration files and prompt before overwriting
+- Timestamped backups created automatically (when chosen)
+- User confirmation required for destructive operations
 - User confirmation required for destructive operations
 
 ## Troubleshooting

@@ -336,7 +336,7 @@ stow bash  # Re-stow if needed
 7. **Keep backups**: Don't delete backup directories immediately - keep them for a few days
 8. **Separate sensitive data**: Use a separate private config for sensitive settings
 9. **Version control everything**: Commit small, logical changes
-7. **Use branches**: Create branches for experiments
+10. **Use branches**: Create branches for experiments
 
 ## Example .gitignore for Dotfiles
 

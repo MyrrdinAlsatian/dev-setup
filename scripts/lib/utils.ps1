@@ -68,6 +68,7 @@ function Backup-Item {
 
 ################################################################################
 # Prompt user for action when config file exists
+# Returns: 0 to proceed (with or without backup), 1 to skip
 ################################################################################
 function Prompt-ConfigOverwrite {
     param(
@@ -91,19 +92,19 @@ function Prompt-ConfigOverwrite {
     switch ($choice) {
         "1" {
             Backup-Item $ConfigFile
-            return 0
+            return 0  # Proceed with backup
         }
         "2" {
             Write-LogWarning "Skipping $Description"
-            return 1
+            return 1  # Skip
         }
         "3" {
             Write-LogWarning "Proceeding without backup..."
-            return 2
+            return 0  # Proceed without backup
         }
         default {
             Write-LogError "Invalid option. Skipping $Description"
-            return 1
+            return 1  # Skip on invalid input
         }
     }
 }

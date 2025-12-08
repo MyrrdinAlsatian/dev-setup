@@ -104,7 +104,7 @@ backup_file() {
 #   $1 - Config file path
 #   $2 - Description (e.g., "Starship configuration")
 # Returns:
-#   0 to proceed with backup, 1 to skip, 2 to overwrite
+#   0 to proceed (with or without backup), 1 to skip
 ################################################################################
 prompt_config_overwrite() {
     local config_file="$1"
@@ -127,19 +127,19 @@ prompt_config_overwrite() {
     case "${choice}" in
         1)
             backup_file "${config_file}"
-            return 0
+            return 0  # Proceed with backup
             ;;
         2)
             log_warning "Skipping ${description}"
-            return 1
+            return 1  # Skip
             ;;
         3)
             log_warning "Proceeding without backup..."
-            return 2
+            return 0  # Proceed without backup
             ;;
         *)
             log_error "Invalid option. Skipping ${description}"
-            return 1
+            return 1  # Skip on invalid input
             ;;
     esac
 }

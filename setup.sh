@@ -196,6 +196,10 @@ main() {
             source "${MODULES_DIR}/optional_tools.sh"
             install_optional_tools
         fi
+        
+        # Install UV CLI tools
+        source "${MODULES_DIR}/uv_tools.sh"
+        install_uv_cli_tools
     else
         log_info "Skipping tool installation (--skip-tools)"
     fi

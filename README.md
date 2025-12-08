@@ -145,6 +145,7 @@ dev-setup/
 │       ├── nvm.sh              # NVM installation
 │       ├── tmux.sh             # Tmux installation & config
 │       ├── starship.sh         # Starship prompt installation
+│       ├── optional_tools.sh   # Optional development tools
 │       ├── dotfiles.sh         # Dotfiles management
 │       └── *.ps1               # PowerShell equivalents
 ├── config/
@@ -164,6 +165,7 @@ INSTALL_DOCKER=true
 INSTALL_NVM=true
 INSTALL_TMUX=true
 INSTALL_STARSHIP=true
+INSTALL_OPTIONAL_TOOLS=true
 SETUP_DOTFILES=true
 ```
 
@@ -254,6 +256,40 @@ dotfiles/
 - Git status integration
 - Custom configuration
 - **Safe installation**: Prompts before overwriting existing `~/.config/starship.toml`
+
+### Optional Development Tools
+
+The setup includes optional but recommended development tools for enhanced productivity. These are installed interactively when `INSTALL_OPTIONAL_TOOLS=true` (default).
+
+#### Fonts
+- **Fira Code Nerd Font**: Programming font with ligatures and icon support
+
+#### CLI Utilities
+- **jq**: Command-line JSON processor for parsing and manipulating JSON data
+- **yq**: Command-line YAML processor (similar to jq but for YAML)
+- **make**: Build automation tool for compiling and building projects
+
+#### Terminal Emulator
+- **Tabby**: Modern, cross-platform terminal (requires manual installation from https://tabby.sh/)
+- **Alacritty**: Alternative GPU-accelerated terminal emulator (offered as substitute)
+
+#### Image Processing Tools
+- **ffmpeg**: Complete solution for recording, converting, and streaming audio/video
+- **imagemagick**: Image manipulation and conversion tool suite
+- **jpegoptim**: JPEG optimization utility for reducing file sizes
+- **optipng**: PNG optimization utility for lossless compression
+
+#### Certificate Management
+- **mkcert**: Locally trusted development certificates for HTTPS testing
+  - After installation, run `mkcert -install` to set up the local CA
+
+#### Database Tools
+- **DBeaver**: Free universal database management tool with GUI
+  - Supports PostgreSQL, MySQL, SQLite, Oracle, and more
+- **PostgreSQL Client**: Command-line tools for PostgreSQL databases
+  - Includes `psql`, `pg_dump`, and other PostgreSQL utilities
+
+**Note**: All optional tools prompt for installation individually. You can skip any tool by declining the prompt or disable all optional tools by setting `INSTALL_OPTIONAL_TOOLS=false` in your configuration file.
 
 ### SSH and GPG Keys Setup
 - Interactive script for generating SSH and GPG keys

@@ -147,6 +147,7 @@ track_failure() {
 # Print summary of failed operations
 ################################################################################
 print_failure_summary() {
+    # Check if array has elements (works with set -u)
     if [[ ${#FAILED_OPERATIONS[@]} -eq 0 ]]; then
         return 0
     fi

@@ -25,12 +25,15 @@ Automate the setup of your development environment across Linux, macOS, Windows,
 - Git-based dotfiles repository synchronization
 - Automatic backup of existing configurations
 - Safe conflict resolution
+- Configuration overwrite protection
 
 🔐 **Security & Best Practices**
 - Robust error handling
 - Prerequisite verification
 - Package manager detection
 - Non-destructive operations with backups
+- Configuration detection before any modifications
+- User prompts for all potentially destructive operations
 
 📊 **Developer Experience**
 - Colored, informative logging
@@ -188,9 +191,21 @@ dotfiles/
 
 The setup script will:
 1. Clone your dotfiles repository to `~/.dotfiles`
-2. Ask which packages to install
-3. Use GNU Stow to create symlinks
-4. Backup any existing files
+2. Detect any existing configuration files that would be overwritten
+3. Prompt you with options for each conflict:
+   - **Backup and install** (recommended): Creates timestamped backups in `~/.dotfiles-backup/`
+   - **Skip**: Leaves existing files untouched
+   - **Overwrite**: Replaces files without backup (not recommended)
+4. Ask which packages to install
+5. Use GNU Stow to create symlinks safely
+
+### Configuration Safety Features
+
+**Conflict Detection**: Before modifying any files, the tool scans for existing configurations and lists all conflicts.
+
+**Backup Protection**: When you choose to backup, files are saved to `~/.dotfiles-backup/YYYYMMDD_HHMMSS/` with the full directory structure preserved.
+
+**User Control**: You're always prompted before any destructive operations, ensuring no accidental data loss.
 
 ### Windows Dotfiles
 
@@ -231,12 +246,14 @@ dotfiles/
   - Better key bindings
   - Custom status bar
   - Vim-friendly settings
+- **Safe installation**: Prompts before overwriting existing `~/.tmux.conf`
 
 ### Starship
 - Fast, cross-shell prompt
 - Nerd Font icons
 - Git status integration
 - Custom configuration
+- **Safe installation**: Prompts before overwriting existing `~/.config/starship.toml`
 
 ## Requirements
 
@@ -260,7 +277,8 @@ dotfiles/
 - Scripts use `set -euo pipefail` for robust error handling
 - No hardcoded credentials
 - All external downloads use HTTPS
-- Existing files are backed up before modification
+- **Configuration Protection**: All modules detect existing configuration files and prompt before overwriting
+- Timestamped backups created automatically (when chosen)
 - User confirmation required for destructive operations
 
 ## Troubleshooting

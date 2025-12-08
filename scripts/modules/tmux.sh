@@ -47,8 +47,10 @@ configure_tmux() {
     
     log_step "Configuring Tmux..."
     
-    # Backup existing configuration
-    backup_file "${tmux_conf}"
+    # Prompt user about existing configuration
+    if ! prompt_config_overwrite "${tmux_conf}" "Tmux configuration"; then
+        return 0
+    fi
     
     # Create basic tmux configuration
     cat > "${tmux_conf}" << 'EOF'

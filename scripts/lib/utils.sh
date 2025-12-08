@@ -99,6 +99,87 @@ backup_file() {
 }
 
 ################################################################################
+# Prompt user for action when config file exists
+# Arguments:
+#   $1 - Config file path
+#   $2 - Description (e.g., "Starship configuration")
+# Returns:
+#   0 to proceed (with or without backup), 1 to skip
+################################################################################
+prompt_config_overwrite() {
+    local config_file="$1"
+    local description="$2"
+    
+    if [[ ! -e "${config_file}" ]]; then
+        return 0  # File doesn't exist, safe to create
+    fi
+    
+    log_warning "${description} already exists at: ${config_file}"
+    log_info "Options:"
+    log_info "  1) Backup existing and create new (recommended)"
+    log_info "  2) Skip (keep existing)"
+    log_info "  3) Overwrite without backup (not recommended)"
+    echo ""
+    
+    local choice
+    read -r -p "Choose an option [1/2/3]: " choice
+    
+    case "${choice}" in
+        1)
+            backup_file "${config_file}"
+            return 0  # Proceed with backup
+            ;;
+        2)
+            log_warning "Skipping ${description}"
+            return 1  # Skip
+            ;;
+        3)
+            log_warning "Proceeding without backup..."
+            return 0  # Proceed without backup
+            ;;
+        *)
+            log_error "Invalid option. Skipping ${description}"
+            return 1  # Skip on invalid input
+            ;;
+    esac
+}
+
+################################################################################
+# Safe write to config file with backup prompt
+# Arguments:
+#   $1 - Config file path
+#   $2 - Description (e.g., "Starship configuration")
+#   $3 - Content to write (or "-" to read from stdin)
+# Returns:
+#   0 on success, 1 if skipped
+################################################################################
+safe_write_config() {
+    local config_file="$1"
+    local description="$2"
+    local content="$3"
+    
+    # Prompt if file exists
+    if ! prompt_config_overwrite "${config_file}" "${description}"; then
+        return 1
+    fi
+    
+    # Create parent directory if needed
+    ensure_directory "$(dirname "${config_file}")"
+    
+    # Write content
+    if [[ "${content}" == "-" ]]; then
+        # Read from stdin
+        cat > "${config_file}"
+    else
+        echo "${content}" > "${config_file}"
+    fi
+    
+    log_success "${description} created at: ${config_file}"
+    return 0
+}
+
+
+################################################################################
 # Download a file
 # Arguments:
 #   $1 - URL

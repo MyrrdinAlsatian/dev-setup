@@ -117,9 +117,40 @@ function Apply-Dotfiles {
     $profileSource = Join-Path $script:DOTFILES_DIR "powershell\Microsoft.PowerShell_profile.ps1"
     if (Test-Path $profileSource) {
         $profileDest = $PROFILE
-        Backup-Item $profileDest
-        Copy-Item -Path $profileSource -Destination $profileDest -Force
-        Write-LogSuccess "PowerShell profile installed"
+        
+        # Check if profile already exists
+        if (Test-Path $profileDest) {
+            Write-LogWarning "PowerShell profile already exists at: $profileDest"
+            Write-LogInfo "Options:"
+            Write-LogInfo "  1) Backup existing and install new profile (recommended)"
+            Write-LogInfo "  2) Skip profile installation"
+            Write-LogInfo "  3) Overwrite without backup (not recommended)"
+            Write-Host ""
+            
+            $choice = Read-Host "Choose an option [1/2/3]"
+            
+            switch ($choice) {
+                "1" {
+                    Backup-Item $profileDest
+                    Copy-Item -Path $profileSource -Destination $profileDest -Force
+                    Write-LogSuccess "PowerShell profile installed (backup created)"
+                }
+                "2" {
+                    Write-LogWarning "Skipped PowerShell profile installation"
+                }
+                "3" {
+                    Copy-Item -Path $profileSource -Destination $profileDest -Force
+                    Write-LogSuccess "PowerShell profile installed (no backup)"
+                }
+                default {
+                    Write-LogError "Invalid option. Skipping profile installation."
+                }
+            }
+        } else {
+            # No existing profile, just install
+            Copy-Item -Path $profileSource -Destination $profileDest -Force
+            Write-LogSuccess "PowerShell profile installed"
+        }
     }
     
     Write-LogSuccess "Dotfiles applied successfully"
@@ -131,17 +162,101 @@ function Apply-Dotfiles {
 function Apply-WindowsDotfiles {
     param([string]$SourceDir)
     
-    # Copy files from windows directory to appropriate locations
+    # Get all files that would be copied
     $items = Get-ChildItem -Path $SourceDir -Recurse -File
+    $conflicts = @()
     
+    # First pass: detect conflicts
     foreach ($item in $items) {
         $relativePath = $item.FullName.Substring($SourceDir.Length + 1)
         $destPath = Join-Path $env:USERPROFILE $relativePath
         
-        Ensure-Directory (Split-Path $destPath -Parent)
-        Backup-Item $destPath
+        if (Test-Path $destPath) {
+            $conflicts += $destPath
+        }
+    }
+    
+    # If conflicts exist, ask user what to do
+    if ($conflicts.Count -gt 0) {
+        Write-LogWarning "Found existing configuration files that would be overwritten:"
+        foreach ($conflict in $conflicts) {
+            Write-Host "  - $conflict"
+        }
+        Write-Host ""
+        Write-LogInfo "Options:"
+        Write-LogInfo "  1) Backup existing files and install (recommended)"
+        Write-LogInfo "  2) Skip all conflicting files"
+        Write-LogInfo "  3) Overwrite without backup (not recommended)"
+        Write-Host ""
         
-        Copy-Item -Path $item.FullName -Destination $destPath -Force
-        Write-LogStep "Installed: $relativePath"
+        $choice = Read-Host "Choose an option [1/2/3]"
+        
+        switch ($choice) {
+            "1" {
+                Write-LogStep "Backing up existing files..."
+                $backupCreated = $false
+                
+                foreach ($item in $items) {
+                    $relativePath = $item.FullName.Substring($SourceDir.Length + 1)
+                    $destPath = Join-Path $env:USERPROFILE $relativePath
+                    
+                    if (Test-Path $destPath) {
+                        Ensure-Directory (Split-Path $destPath -Parent)
+                        Backup-Item $destPath
+                        $backupCreated = $true
+                    }
+                    
+                    Ensure-Directory (Split-Path $destPath -Parent)
+                    Copy-Item -Path $item.FullName -Destination $destPath -Force
+                    Write-LogStep "Installed: $relativePath"
+                }
+                
+                if ($backupCreated) {
+                    Write-LogSuccess "Files backed up and installed"
+                }
+            }
+            "2" {
+                Write-LogWarning "Skipping conflicting files, installing new files only..."
+                
+                foreach ($item in $items) {
+                    $relativePath = $item.FullName.Substring($SourceDir.Length + 1)
+                    $destPath = Join-Path $env:USERPROFILE $relativePath
+                    
+                    if (-not (Test-Path $destPath)) {
+                        Ensure-Directory (Split-Path $destPath -Parent)
+                        Copy-Item -Path $item.FullName -Destination $destPath -Force
+                        Write-LogStep "Installed: $relativePath"
+                    } else {
+                        Write-LogInfo "Skipped (already exists): $relativePath"
+                    }
+                }
+            }
+            "3" {
+                Write-LogWarning "Proceeding without backup..."
+                
+                foreach ($item in $items) {
+                    $relativePath = $item.FullName.Substring($SourceDir.Length + 1)
+                    $destPath = Join-Path $env:USERPROFILE $relativePath
+                    
+                    Ensure-Directory (Split-Path $destPath -Parent)
+                    Copy-Item -Path $item.FullName -Destination $destPath -Force
+                    Write-LogStep "Installed: $relativePath"
+                }
+            }
+            default {
+                Write-LogError "Invalid option. Aborting installation."
+                return
+            }
+        }
+    } else {
+        # No conflicts, install normally
+        foreach ($item in $items) {
+            $relativePath = $item.FullName.Substring($SourceDir.Length + 1)
+            $destPath = Join-Path $env:USERPROFILE $relativePath
+            
+            Ensure-Directory (Split-Path $destPath -Parent)
+            Copy-Item -Path $item.FullName -Destination $destPath -Force
+            Write-LogStep "Installed: $relativePath"
+        }
     }
 }

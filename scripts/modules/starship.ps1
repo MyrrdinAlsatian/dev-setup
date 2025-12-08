@@ -71,8 +71,9 @@ function Create-StarshipConfig {
     
     Ensure-Directory $config_dir
     
-    if (Test-Path $starship_config) {
-        Write-LogInfo "Starship configuration already exists at: $starship_config"
+    # Use Prompt-ConfigOverwrite to handle existing files
+    $result = Prompt-ConfigOverwrite $starship_config "Starship configuration"
+    if ($result -eq 1) {
         return
     }
     

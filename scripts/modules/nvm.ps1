@@ -84,8 +84,8 @@ function Install-Pnpm {
     if (Test-CommandExists "corepack") {
         Write-LogInfo "Using corepack to install pnpm"
         try {
-            corepack enable 2>$null
-            corepack prepare pnpm@latest --activate 2>$null
+            corepack enable *>$null
+            corepack prepare pnpm@latest --activate *>$null
             if (Test-CommandExists "pnpm") {
                 $pnpmVersion = pnpm --version
                 Write-LogSuccess "pnpm $pnpmVersion installed via corepack"
@@ -99,7 +99,7 @@ function Install-Pnpm {
     # Fallback to npm install -g pnpm
     Write-LogInfo "Installing pnpm via npm"
     try {
-        npm install -g pnpm 2>$null
+        npm install -g pnpm *>$null
         if (Test-CommandExists "pnpm") {
             $pnpmVersion = pnpm --version
             Write-LogSuccess "pnpm $pnpmVersion installed via npm"

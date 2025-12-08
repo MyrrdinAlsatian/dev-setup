@@ -87,13 +87,11 @@ install_pnpm() {
     # Try corepack first (preferred method for pnpm installation)
     if command -v corepack >/dev/null 2>&1; then
         log_info "Using corepack to install pnpm"
-        if corepack enable 2>/dev/null; then
-            if corepack prepare pnpm@latest --activate 2>/dev/null; then
-                local pnpm_version
-                pnpm_version=$(pnpm --version 2>/dev/null || echo "unknown")
-                log_success "pnpm ${pnpm_version} installed via corepack"
-                return 0
-            fi
+        if corepack enable 2>/dev/null && corepack prepare pnpm@latest --activate 2>/dev/null; then
+            local pnpm_version
+            pnpm_version=$(pnpm --version 2>/dev/null || echo "unknown")
+            log_success "pnpm ${pnpm_version} installed via corepack"
+            return 0
         fi
         log_warning "corepack failed, falling back to npm installation"
     fi

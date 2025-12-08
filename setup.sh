@@ -190,6 +190,12 @@ main() {
         
         source "${MODULES_DIR}/starship.sh"
         install_starship
+        
+        # Install optional tools if enabled
+        if [[ "${INSTALL_OPTIONAL_TOOLS:-true}" == true ]]; then
+            source "${MODULES_DIR}/optional_tools.sh"
+            install_optional_tools
+        fi
     else
         log_info "Skipping tool installation (--skip-tools)"
     fi

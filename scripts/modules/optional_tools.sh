@@ -12,6 +12,10 @@
 # - Database tools (DBeaver, PostgreSQL client)
 ################################################################################
 
+# Version constants for tools installed via binary download
+readonly YQ_VERSION="v4.40.5"
+readonly MKCERT_VERSION="v1.4.4"
+
 ################################################################################
 # Enable Ubuntu Universe Repository
 ################################################################################
@@ -142,8 +146,6 @@ install_yq() {
     
     log_step "Installing yq..."
     
-    local yq_release_version="v4.40.5"
-    
     if is_macos; then
         brew install yq
     elif is_linux; then
@@ -162,7 +164,7 @@ install_yq() {
                 ;;
         esac
         
-        local yq_url="https://github.com/mikefarah/yq/releases/download/${yq_release_version}/yq_linux_${arch}"
+        local yq_url="https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_linux_${arch}"
         
         log_info "Downloading yq..."
         if command_exists curl; then
@@ -300,12 +302,7 @@ install_image_tools() {
         case "${tool}" in
             imagemagick)
                 local cmd="convert"
-                local pkg
-                if is_macos; then
-                    pkg="imagemagick"
-                else
-                    pkg="imagemagick"
-                fi
+                local pkg="imagemagick"
                 ;;
             *)
                 local cmd="${tool}"
@@ -346,8 +343,6 @@ install_mkcert() {
     
     log_step "Installing mkcert..."
     
-    local mkcert_version="v1.4.4"
-    
     if is_macos; then
         brew install mkcert
         brew install nss  # For Firefox support
@@ -372,7 +367,7 @@ install_mkcert() {
                         ;;
                 esac
                 
-                local mkcert_url="https://github.com/FiloSottile/mkcert/releases/download/${mkcert_version}/mkcert-${mkcert_version}-linux-${arch}"
+                local mkcert_url="https://github.com/FiloSottile/mkcert/releases/download/${MKCERT_VERSION}/mkcert-${MKCERT_VERSION}-linux-${arch}"
                 
                 log_info "Downloading mkcert..."
                 if command_exists curl; then
@@ -404,7 +399,7 @@ install_mkcert() {
                         ;;
                 esac
                 
-                local mkcert_url="https://github.com/FiloSottile/mkcert/releases/download/${mkcert_version}/mkcert-${mkcert_version}-linux-${arch}"
+                local mkcert_url="https://github.com/FiloSottile/mkcert/releases/download/${MKCERT_VERSION}/mkcert-${MKCERT_VERSION}-linux-${arch}"
                 
                 # Add curl/wget fallback
                 if command_exists curl; then

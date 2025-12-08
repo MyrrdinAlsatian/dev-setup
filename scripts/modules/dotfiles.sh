@@ -9,6 +9,9 @@
 DOTFILES_REPO="${DOTFILES_REPO:-https://github.com/username/dotfiles.git}"
 DOTFILES_DIR="${HOME}/.dotfiles"
 
+# Pattern to identify symlinks pointing to our dotfiles directory
+DOTFILES_SYMLINK_PATTERN="/.dotfiles/"
+
 ################################################################################
 # Setup dotfiles
 ################################################################################
@@ -245,6 +248,7 @@ detect_conflicts() {
     local conflicts=""
     
     # Find files in package using null-terminated strings for safety
+    # Note: Parentheses group -type expressions for OR logic precedence
     while IFS= read -r -d '' file; do
         # Remove package prefix to get relative path
         local rel_path="${file#${package}/}"
@@ -256,7 +260,7 @@ detect_conflicts() {
                 # Check if symlink points to our dotfiles
                 local link_target
                 link_target=$(readlink "${target_file}")
-                if [[ "${link_target}" != *"/.dotfiles/"* ]]; then
+                if [[ "${link_target}" != *"${DOTFILES_SYMLINK_PATTERN}"* ]]; then
                     conflicts="${conflicts}  - ${target_file} (symlink to: ${link_target})"$'\n'
                 fi
             else
@@ -280,6 +284,7 @@ backup_existing_files() {
     local backed_up=false
     
     # Find files in package using null-terminated strings for safety
+    # Note: Parentheses group -type expressions for OR logic precedence
     while IFS= read -r -d '' file; do
         # Remove package prefix to get relative path
         local rel_path="${file#${package}/}"
@@ -296,7 +301,7 @@ backup_existing_files() {
             # Backup symlinks too
             local link_target
             link_target=$(readlink "${target_file}")
-            if [[ "${link_target}" != *"/.dotfiles/"* ]]; then
+            if [[ "${link_target}" != *"${DOTFILES_SYMLINK_PATTERN}"* ]]; then
                 ensure_directory "${backup_dir}/$(dirname "${rel_path}")"
                 if cp -P "${target_file}" "${backup_dir}/${rel_path}" 2>/dev/null; then
                     backed_up=true

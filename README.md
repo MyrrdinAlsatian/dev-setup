@@ -255,6 +255,25 @@ dotfiles/
 - Custom configuration
 - **Safe installation**: Prompts before overwriting existing `~/.config/starship.toml`
 
+### SSH and GPG Keys Setup
+- Interactive script for generating SSH and GPG keys
+- **Ed25519** keys by default (recommended for security and performance)
+- Optional **RSA 4096** keys for maximum compatibility
+- Automatic configuration of Git signing
+- Easy GitHub/GitLab integration
+- See [SSH/GPG Keys Guide](docs/keys.md) for detailed instructions
+
+```bash
+# Generate SSH and GPG keys interactively
+./scripts/setup-keys.sh
+
+# Quick setup with ed25519 (recommended)
+./scripts/setup-keys.sh --email "your@email.com" --name "Your Name"
+
+# Use RSA instead of ed25519
+./scripts/setup-keys.sh --ssh-type rsa --email "your@email.com"
+```
+
 ## Requirements
 
 ### Linux

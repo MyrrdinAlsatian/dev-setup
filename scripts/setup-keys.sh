@@ -90,18 +90,38 @@ parse_arguments() {
     while [[ $# -gt 0 ]]; do
         case $1 in
             --email)
+                if [[ -z "${2:-}" ]] || [[ "$2" == --* ]]; then
+                    log_error "L'option --email nécessite une valeur"
+                    exit 1
+                fi
                 USER_EMAIL="$2"
                 shift 2
                 ;;
             --name)
+                if [[ -z "${2:-}" ]] || [[ "$2" == --* ]]; then
+                    log_error "L'option --name nécessite une valeur"
+                    exit 1
+                fi
                 USER_NAME="$2"
                 shift 2
                 ;;
             --ssh-path)
+                if [[ -z "${2:-}" ]] || [[ "$2" == --* ]]; then
+                    log_error "L'option --ssh-path nécessite une valeur"
+                    exit 1
+                fi
                 SSH_KEY_PATH="$2"
                 shift 2
                 ;;
             --ssh-type)
+                if [[ -z "${2:-}" ]] || [[ "$2" == --* ]]; then
+                    log_error "L'option --ssh-type nécessite une valeur"
+                    exit 1
+                fi
+                if [[ "$2" != "ed25519" ]] && [[ "$2" != "rsa" ]]; then
+                    log_error "Type de clé SSH invalide: $2 (valeurs acceptées: ed25519, rsa)"
+                    exit 1
+                fi
                 SSH_KEY_TYPE="$2"
                 shift 2
                 ;;
@@ -400,8 +420,6 @@ configure_ssh_config() {
     fi
     
     local ssh_config="${HOME}/.ssh/config"
-    local key_name
-    key_name=$(basename "${SSH_KEY_PATH}")
     
     # Créer le fichier si il n'existe pas
     if [[ ! -f "${ssh_config}" ]]; then

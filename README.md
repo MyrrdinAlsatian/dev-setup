@@ -240,6 +240,8 @@ dotfiles/
 - Latest version
 - Automatic LTS Node.js installation
 - Shell integration
+- **NPM_CONFIG_PREFIX handling**: The setup automatically unsets the NPM_CONFIG_PREFIX environment variable if present, as it's incompatible with nvm
+- **pnpm installation**: Automatically installs pnpm package manager using corepack (preferred) or npm
 
 ### Tmux (Linux/macOS only)
 - Terminal multiplexer
@@ -337,6 +339,19 @@ The setup includes optional but recommended development tools for enhanced produ
 - User confirmation required for destructive operations
 
 ## Troubleshooting
+
+### NPM_CONFIG_PREFIX Compatibility
+
+**Issue**: If you see the error "nvm is not compatible with the NPM_CONFIG_PREFIX environment variable: currently set to '/home/ubuntu/.npm-global'", the setup scripts automatically handle this.
+
+**What the scripts do**:
+- The setup automatically unsets NPM_CONFIG_PREFIX before running nvm commands
+- This ensures nvm can manage Node.js versions properly
+
+**If you rely on a custom npm global prefix**:
+- After setup completes, you can restore NPM_CONFIG_PREFIX in your shell configuration
+- Add to your `~/.bashrc` or `~/.zshrc`: `export NPM_CONFIG_PREFIX="/your/custom/path"`
+- Note: This may cause conflicts with nvm, so it's recommended to use nvm's default behavior instead
 
 ### Permission Errors
 

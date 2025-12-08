@@ -244,11 +244,8 @@ detect_conflicts() {
     local package="$1"
     local conflicts=""
     
-    # Find files in package
-    local files
-    files=$(find "${package}" -type f -o -type l 2>/dev/null)
-    
-    for file in ${files}; do
+    # Find files in package using null-terminated strings for safety
+    while IFS= read -r -d '' file; do
         # Remove package prefix to get relative path
         local rel_path="${file#${package}/}"
         local target_file="${HOME}/${rel_path}"
@@ -267,7 +264,7 @@ detect_conflicts() {
                 conflicts="${conflicts}  - ${target_file}"$'\n'
             fi
         fi
-    done
+    done < <(find "${package}" \( -type f -o -type l \) -print0 2>/dev/null)
     
     echo -n "${conflicts}"
 }
@@ -282,11 +279,8 @@ backup_existing_files() {
     local backup_dir="${HOME}/.dotfiles-backup/$(date +%Y%m%d_%H%M%S)"
     local backed_up=false
     
-    # Find files in package
-    local files
-    files=$(find "${package}" -type f -o -type l 2>/dev/null)
-    
-    for file in ${files}; do
+    # Find files in package using null-terminated strings for safety
+    while IFS= read -r -d '' file; do
         # Remove package prefix to get relative path
         local rel_path="${file#${package}/}"
         local target_file="${HOME}/${rel_path}"
@@ -310,7 +304,7 @@ backup_existing_files() {
                 fi
             fi
         fi
-    done
+    done < <(find "${package}" \( -type f -o -type l \) -print0 2>/dev/null)
     
     if [[ "${backed_up}" == "true" ]]; then
         log_success "Backed up existing files to: ${backup_dir}"

@@ -246,6 +246,64 @@ cd ~/.dotfiles
 stow bash git vim tmux
 ```
 
+### Handling Configuration Conflicts
+
+When you import dotfiles, the tool will automatically detect any existing configuration files that would be overwritten. You'll be presented with three options:
+
+**Option 1: Backup and Install (Recommended)**
+```
+Found existing configuration files that would be overwritten:
+  - /home/user/.bashrc
+  - /home/user/.gitconfig
+
+Choose an option [1/2/3]: 1
+```
+This will:
+- Create a timestamped backup directory: `~/.dotfiles-backup/20231208_143022/`
+- Copy all conflicting files to the backup directory
+- Install your dotfiles via symlinks
+
+**Option 2: Skip Package**
+```
+Choose an option [1/2/3]: 2
+```
+This will:
+- Leave all existing files untouched
+- Skip installation of this package
+- Proceed to the next package
+
+**Option 3: Overwrite Without Backup**
+```
+Choose an option [1/2/3]: 3
+```
+This will:
+- Replace existing files immediately
+- No backup is created
+- ⚠️ Use with caution - data may be lost
+
+### Backup Location
+
+All backups are stored in:
+- **Linux/macOS**: `~/.dotfiles-backup/YYYYMMDD_HHMMSS/`
+- **Windows**: `%USERPROFILE%\.dotfiles-backup\YYYYMMDD_HHMMSS\`
+
+Each backup session creates a new timestamped directory, so you can keep multiple backups and easily restore from them.
+
+### Restoring from Backup
+
+If you need to restore your original configurations:
+
+```bash
+# Find your backup
+ls -la ~/.dotfiles-backup/
+
+# Restore a specific file
+cp ~/.dotfiles-backup/20231208_143022/.bashrc ~/
+
+# Or restore everything
+cp -r ~/.dotfiles-backup/20231208_143022/* ~/
+```
+
 ### Updating Dotfiles
 
 ```bash
@@ -269,12 +327,15 @@ stow bash  # Re-stow if needed
 
 ## Best Practices
 
-1. **Don't commit secrets**: Never commit API keys, passwords, or tokens
-2. **Use .gitignore**: Ignore OS-specific files
-3. **Document**: Add README explaining your setup
-4. **Test**: Test on a fresh system before deploying widely
-5. **Separate sensitive data**: Use a separate private config for sensitive settings
-6. **Version control everything**: Commit small, logical changes
+1. **Always backup first**: When prompted, choose option 1 to backup existing configurations
+2. **Don't commit secrets**: Never commit API keys, passwords, or tokens
+3. **Use .gitignore**: Ignore OS-specific files
+4. **Document**: Add README explaining your setup
+5. **Test**: Test on a fresh system before deploying widely
+6. **Review conflicts**: Always review the list of conflicting files before choosing an option
+7. **Keep backups**: Don't delete backup directories immediately - keep them for a few days
+8. **Separate sensitive data**: Use a separate private config for sensitive settings
+9. **Version control everything**: Commit small, logical changes
 7. **Use branches**: Create branches for experiments
 
 ## Example .gitignore for Dotfiles

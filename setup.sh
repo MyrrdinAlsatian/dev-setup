@@ -204,29 +204,29 @@ main() {
         log_section "Tool Installation"
         
         source "${MODULES_DIR}/git.sh"
-        safe_install install_git "Git"
+        safe_install install_git "Git" || true
         
         source "${MODULES_DIR}/docker.sh"
-        safe_install install_docker "Docker"
+        safe_install install_docker "Docker" || true
         
         source "${MODULES_DIR}/nvm.sh"
-        safe_install install_nvm "NVM (Node Version Manager)"
+        safe_install install_nvm "NVM (Node Version Manager)" || true
         
         source "${MODULES_DIR}/tmux.sh"
-        safe_install install_tmux "Tmux"
+        safe_install install_tmux "Tmux" || true
         
         source "${MODULES_DIR}/starship.sh"
-        safe_install install_starship "Starship"
+        safe_install install_starship "Starship" || true
         
         # Install optional tools if enabled
         if [[ "${INSTALL_OPTIONAL_TOOLS:-true}" == true ]]; then
             source "${MODULES_DIR}/optional_tools.sh"
-            safe_install install_optional_tools "Optional Tools"
+            safe_install install_optional_tools "Optional Tools" || true
         fi
         
         # Install UV CLI tools
         source "${MODULES_DIR}/uv_tools.sh"
-        safe_install install_uv_cli_tools "UV CLI Tools"
+        safe_install install_uv_cli_tools "UV CLI Tools" || true
     else
         log_info "Skipping tool installation (--skip-tools)"
     fi
@@ -235,7 +235,7 @@ main() {
     if [[ "${SKIP_DOTFILES}" != true ]]; then
         log_section "Dotfiles Configuration"
         source "${MODULES_DIR}/dotfiles.sh"
-        safe_install setup_dotfiles "Dotfiles"
+        safe_install setup_dotfiles "Dotfiles" || true
     else
         log_info "Skipping dotfiles configuration (--skip-dotfiles)"
     fi

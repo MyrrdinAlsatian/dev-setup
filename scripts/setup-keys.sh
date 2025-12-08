@@ -2,7 +2,7 @@
 
 ################################################################################
 # SSH and GPG Keys Setup Script
-# Génère et configure les clés SSH et GPG pour GitHub/GitLab
+# Generates and configures SSH and GPG keys for GitHub/GitLab
 ################################################################################
 
 set -euo pipefail
@@ -49,34 +49,34 @@ GENERATE_GPG=true
 NON_INTERACTIVE=false
 
 ################################################################################
-# Afficher l'aide
+# Display help
 ################################################################################
 show_help() {
     cat << EOF
 Usage: $(basename "$0") [OPTIONS]
 
-Script d'initialisation des clés SSH et GPG pour GitHub/GitLab.
+SSH and GPG keys initialization script for GitHub/GitLab.
 
 OPTIONS:
-    --email EMAIL          Adresse e-mail (utilisée pour SSH et GPG)
-    --name NAME            Nom complet (utilisé pour GPG et Git)
-    --ssh-path PATH        Chemin de la clé SSH (défaut: ~/.ssh/id_ed25519 ou id_rsa)
-    --ssh-type TYPE        Type de clé SSH: ed25519 (défaut) ou rsa
-    --no-ssh               Ne pas générer de clé SSH
-    --no-gpg               Ne pas générer de clé GPG
-    --help                 Afficher cette aide
+    --email EMAIL          Email address (used for SSH and GPG)
+    --name NAME            Full name (used for GPG and Git)
+    --ssh-path PATH        SSH key path (default: ~/.ssh/id_ed25519 or id_rsa)
+    --ssh-type TYPE        SSH key type: ed25519 (default) or rsa
+    --no-ssh               Do not generate SSH key
+    --no-gpg               Do not generate GPG key
+    --help                 Display this help
 
-EXEMPLES:
-    # Mode interactif (par défaut)
+EXAMPLES:
+    # Interactive mode (default)
     ./setup-keys.sh
 
-    # Mode non-interactif avec paramètres
+    # Non-interactive mode with parameters
     ./setup-keys.sh --email "user@example.com" --name "John Doe" --ssh-type rsa
 
-    # Générer uniquement une clé SSH
+    # Generate SSH key only
     ./setup-keys.sh --no-gpg --email "user@example.com"
 
-    # Générer uniquement une clé GPG
+    # Generate GPG key only
     ./setup-keys.sh --no-ssh --email "user@example.com" --name "John Doe"
 
 EOF
@@ -84,14 +84,14 @@ EOF
 }
 
 ################################################################################
-# Parser les arguments de ligne de commande
+# Parse command line arguments
 ################################################################################
 parse_arguments() {
     while [[ $# -gt 0 ]]; do
         case $1 in
             --email)
                 if [[ -z "${2:-}" ]] || [[ "$2" == --* ]]; then
-                    log_error "L'option --email nécessite une valeur"
+                    log_error "The --email option requires a value"
                     exit 1
                 fi
                 USER_EMAIL="$2"
@@ -99,7 +99,7 @@ parse_arguments() {
                 ;;
             --name)
                 if [[ -z "${2:-}" ]] || [[ "$2" == --* ]]; then
-                    log_error "L'option --name nécessite une valeur"
+                    log_error "The --name option requires a value"
                     exit 1
                 fi
                 USER_NAME="$2"
@@ -107,7 +107,7 @@ parse_arguments() {
                 ;;
             --ssh-path)
                 if [[ -z "${2:-}" ]] || [[ "$2" == --* ]]; then
-                    log_error "L'option --ssh-path nécessite une valeur"
+                    log_error "The --ssh-path option requires a value"
                     exit 1
                 fi
                 SSH_KEY_PATH="$2"
@@ -115,11 +115,11 @@ parse_arguments() {
                 ;;
             --ssh-type)
                 if [[ -z "${2:-}" ]] || [[ "$2" == --* ]]; then
-                    log_error "L'option --ssh-type nécessite une valeur"
+                    log_error "The --ssh-type option requires a value"
                     exit 1
                 fi
                 if [[ "$2" != "ed25519" ]] && [[ "$2" != "rsa" ]]; then
-                    log_error "Type de clé SSH invalide: $2 (valeurs acceptées: ed25519, rsa)"
+                    log_error "Invalid SSH key type: $2 (accepted values: ed25519, rsa)"
                     exit 1
                 fi
                 SSH_KEY_TYPE="$2"
@@ -137,24 +137,24 @@ parse_arguments() {
                 show_help
                 ;;
             *)
-                log_error "Option inconnue: $1"
-                echo "Utilisez --help pour afficher l'aide."
+                log_error "Unknown option: $1"
+                echo "Use --help to display help."
                 exit 1
                 ;;
         esac
     done
 
-    # Vérifier si on est en mode non-interactif
+    # Check if we're in non-interactive mode
     if [[ -n "${USER_EMAIL}" ]] || [[ -n "${USER_NAME}" ]] || [[ -n "${SSH_KEY_PATH}" ]]; then
         NON_INTERACTIVE=true
     fi
 }
 
 ################################################################################
-# Vérifier les dépendances requises
+# Check required dependencies
 ################################################################################
 check_dependencies() {
-    log_section "Vérification des dépendances"
+    log_section "Checking dependencies"
     
     local missing_deps=()
     
@@ -181,9 +181,9 @@ check_dependencies() {
     fi
     
     if [[ ${#missing_deps[@]} -gt 0 ]]; then
-        log_error "Dépendances manquantes: ${missing_deps[*]}"
+        log_error "Missing dependencies: ${missing_deps[*]}"
         echo ""
-        log_info "Instructions d'installation:"
+        log_info "Installation instructions:"
         echo ""
         
         if [[ -f /etc/debian_version ]]; then
@@ -196,22 +196,22 @@ check_dependencies() {
         elif [[ "$(uname)" == "Darwin" ]]; then
             echo "  brew install ${missing_deps[*]}"
         else
-            echo "  Installez les paquets suivants: ${missing_deps[*]}"
+            echo "  Install the following packages: ${missing_deps[*]}"
         fi
         
         exit 1
     fi
     
-    log_success "Toutes les dépendances sont présentes"
+    log_success "All dependencies are present"
 }
 
 ################################################################################
-# Valider une adresse e-mail
+# Validate an email address
 ################################################################################
 validate_email() {
     local email="$1"
     
-    # Pattern de validation basique pour e-mail
+    # Basic email validation pattern
     if [[ ! "${email}" =~ ^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$ ]]; then
         return 1
     fi
@@ -220,36 +220,36 @@ validate_email() {
 }
 
 ################################################################################
-# Sanitize une chaîne de caractères (enlever les caractères dangereux)
+# Sanitize a string (remove dangerous characters)
 ################################################################################
 sanitize_string() {
     local input="$1"
     
-    # Enlever les caractères spéciaux dangereux pour le shell
-    # Garder uniquement les lettres, chiffres, espaces, tirets, underscores, points, @
+    # Remove dangerous special characters for the shell
+    # Keep only letters, numbers, spaces, dashes, underscores, dots, @
     echo "${input}" | sed 's/[^a-zA-Z0-9 @._-]//g'
 }
 
 ################################################################################
-# Sanitize un chemin de fichier
+# Sanitize a file path
 ################################################################################
 sanitize_path() {
     local input="$1"
     
-    # Enlever les caractères dangereux des chemins
-    # Garder uniquement les lettres, chiffres, /, _, -, ., ~
+    # Remove dangerous characters from paths
+    # Keep only letters, numbers, /, _, -, ., ~
     echo "${input}" | sed 's/[^a-zA-Z0-9/_.~-]//g'
 }
 
 ################################################################################
-# Fonction pour poser une question oui/non
+# Function to ask a yes/no question
 ################################################################################
 ask() {
     local question="$1"
     local response
     
     while true; do
-        read -r -p "${question} (o/n): " response
+        read -r -p "${question} (y/n): " response
         case "${response}" in
             [oOyY]*)
                 return 0
@@ -258,69 +258,69 @@ ask() {
                 return 1
                 ;;
             *)
-                echo "Réponse invalide. Veuillez entrer o (oui) ou n (non)."
+                echo "Invalid response. Please enter y (yes) or n (no)."
                 ;;
         esac
     done
 }
 
 ################################################################################
-# Collecter les informations utilisateur
+# Collect user information
 ################################################################################
 collect_user_info() {
-    log_section "Informations utilisateur"
+    log_section "User information"
     
-    # E-mail
+    # Email
     if [[ -z "${USER_EMAIL}" ]]; then
         while true; do
-            read -r -p "Entrez votre adresse e-mail: " email_input
+            read -r -p "Enter your email address: " email_input
             email_input=$(sanitize_string "${email_input}")
             
             if validate_email "${email_input}"; then
                 USER_EMAIL="${email_input}"
                 break
             else
-                log_error "Adresse e-mail invalide. Veuillez réessayer."
+                log_error "Invalid email address. Please try again."
             fi
         done
     else
-        log_info "Adresse e-mail: ${USER_EMAIL}"
+        log_info "Email address: ${USER_EMAIL}"
     fi
     
-    # Nom (requis uniquement si GPG est activé)
+    # Name (required only if GPG is enabled)
     if [[ "${GENERATE_GPG}" == true ]] && [[ -z "${USER_NAME}" ]]; then
-        read -r -p "Entrez votre nom complet: " name_input
+        read -r -p "Enter your full name: " name_input
         USER_NAME=$(sanitize_string "${name_input}")
     fi
     
     if [[ -n "${USER_NAME}" ]]; then
-        log_info "Nom: ${USER_NAME}"
+        log_info "Name: ${USER_NAME}"
     fi
 }
 
 ################################################################################
-# Configurer les permissions du répertoire .ssh
+# Setup .ssh directory permissions
 ################################################################################
 setup_ssh_directory() {
     local ssh_dir="${HOME}/.ssh"
     
     if [[ ! -d "${ssh_dir}" ]]; then
-        log_step "Création du répertoire ${ssh_dir}"
+        log_step "Creating directory ${ssh_dir}"
         mkdir -p "${ssh_dir}"
     fi
     
-    # Définir les permissions correctes
+    # Set correct permissions
     chmod 700 "${ssh_dir}"
-    log_step "Permissions définies sur ${ssh_dir}: 700"
+    log_step "Permissions set on ${ssh_dir}: 700"
 }
 
 ################################################################################
-# Générer une clé SSH
+# Generate SSH key
 ################################################################################
 generate_ssh_key() {
-    log_section "Génération de la clé SSH"
+    log_section "SSH key generation"
     
-    # Déterminer le chemin de la clé
+    # Determine key path
     if [[ -z "${SSH_KEY_PATH}" ]]; then
         if [[ "${SSH_KEY_TYPE}" == "ed25519" ]]; then
             SSH_KEY_PATH="${HOME}/.ssh/id_ed25519"
@@ -329,7 +329,7 @@ generate_ssh_key() {
         fi
         
         if [[ "${NON_INTERACTIVE}" == false ]]; then
-            read -r -p "Chemin de la clé SSH [${SSH_KEY_PATH}]: " custom_path
+            read -r -p "SSH key path [${SSH_KEY_PATH}]: " custom_path
             if [[ -n "${custom_path}" ]]; then
                 SSH_KEY_PATH=$(sanitize_path "${custom_path}")
                 # Expand tilde
@@ -341,95 +341,95 @@ generate_ssh_key() {
         SSH_KEY_PATH="${SSH_KEY_PATH/#\~/$HOME}"
     fi
     
-    # Vérifier si la clé existe déjà
+    # Check if key already exists
     if [[ -f "${SSH_KEY_PATH}" ]]; then
-        log_warning "Une clé SSH existe déjà à: ${SSH_KEY_PATH}"
+        log_warning "An SSH key already exists at: ${SSH_KEY_PATH}"
         
         if [[ "${NON_INTERACTIVE}" == true ]]; then
-            log_info "Mode non-interactif: utilisation de la clé existante"
+            log_info "Non-interactive mode: using existing key"
             return 0
         fi
         
-        if ! ask "Voulez-vous la remplacer?"; then
-            log_info "Utilisation de la clé existante"
+        if ! ask "Do you want to replace it?"; then
+            log_info "Using existing key"
             return 0
         fi
     fi
     
-    # Configurer le répertoire .ssh
+    # Setup .ssh directory
     setup_ssh_directory
     
-    # Générer la clé
-    log_step "Génération de la clé SSH ${SSH_KEY_TYPE}..."
+    # Generate the key
+    log_step "Generating ${SSH_KEY_TYPE} SSH key..."
     
     if [[ "${SSH_KEY_TYPE}" == "ed25519" ]]; then
         ssh-keygen -t ed25519 -C "${USER_EMAIL}" -f "${SSH_KEY_PATH}" -N ""
     elif [[ "${SSH_KEY_TYPE}" == "rsa" ]]; then
         ssh-keygen -t rsa -b 4096 -C "${USER_EMAIL}" -f "${SSH_KEY_PATH}" -N ""
     else
-        log_error "Type de clé SSH invalide: ${SSH_KEY_TYPE}"
+        log_error "Invalid SSH key type: ${SSH_KEY_TYPE}"
         return 1
     fi
     
-    # Définir les permissions correctes
+    # Set correct permissions
     chmod 600 "${SSH_KEY_PATH}"
     chmod 644 "${SSH_KEY_PATH}.pub"
-    log_step "Permissions définies: 600 (clé privée), 644 (clé publique)"
+    log_step "Permissions set: 600 (private key), 644 (public key)"
     
-    log_success "Clé SSH générée: ${SSH_KEY_PATH}"
+    log_success "SSH key generated: ${SSH_KEY_PATH}"
     
-    # Ajouter à l'agent SSH
+    # Add to SSH agent
     add_to_ssh_agent
     
-    # Proposer la configuration SSH pour GitHub/GitLab
+    # Propose SSH configuration for GitHub/GitLab
     configure_ssh_config
     
-    # Afficher la clé publique
+    # Display public key
     show_ssh_public_key
 }
 
 ################################################################################
-# Ajouter la clé à l'agent SSH
+# Add key to SSH agent
 ################################################################################
 add_to_ssh_agent() {
-    log_step "Ajout de la clé à l'agent SSH..."
+    log_step "Adding key to SSH agent..."
     
-    # Démarrer l'agent SSH si nécessaire
+    # Start SSH agent if needed
     if [[ -z "${SSH_AUTH_SOCK:-}" ]]; then
         eval "$(ssh-agent -s)" > /dev/null
     fi
     
-    # Ajouter la clé
+    # Add the key
     if ssh-add "${SSH_KEY_PATH}" 2>/dev/null; then
-        log_success "Clé ajoutée à l'agent SSH"
+        log_success "Key added to SSH agent"
     else
-        log_warning "Impossible d'ajouter la clé à l'agent SSH (peut nécessiter une intervention manuelle)"
+        log_warning "Unable to add key to SSH agent (may require manual intervention)"
     fi
 }
 
 ################################################################################
-# Configurer ~/.ssh/config pour GitHub/GitLab
+# Configure ~/.ssh/config for GitHub/GitLab
 ################################################################################
 configure_ssh_config() {
     if [[ "${NON_INTERACTIVE}" == true ]]; then
         return 0
     fi
     
-    if ! ask "Voulez-vous ajouter une entrée dans ~/.ssh/config pour GitHub/GitLab?"; then
+    if ! ask "Do you want to add an entry in ~/.ssh/config for GitHub/GitLab?"; then
         return 0
     fi
     
     local ssh_config="${HOME}/.ssh/config"
     
-    # Créer le fichier si il n'existe pas
+    # Create file if it doesn't exist
     if [[ ! -f "${ssh_config}" ]]; then
         touch "${ssh_config}"
         chmod 600 "${ssh_config}"
     fi
     
-    # Ajouter les configurations pour GitHub et GitLab
+    # Add configurations for GitHub and GitLab
     if ! grep -q "Host github.com" "${ssh_config}"; then
-        log_step "Ajout de la configuration GitHub..."
+        log_step "Adding GitHub configuration..."
         cat >> "${ssh_config}" << EOF
 
 # GitHub
@@ -442,7 +442,7 @@ EOF
     fi
     
     if ! grep -q "Host gitlab.com" "${ssh_config}"; then
-        log_step "Ajout de la configuration GitLab..."
+        log_step "Adding GitLab configuration..."
         cat >> "${ssh_config}" << EOF
 
 # GitLab
@@ -454,60 +454,60 @@ Host gitlab.com
 EOF
     fi
     
-    log_success "Configuration SSH mise à jour: ${ssh_config}"
+    log_success "SSH configuration updated: ${ssh_config}"
 }
 
 ################################################################################
-# Afficher la clé SSH publique
+# Display SSH public key
 ################################################################################
 show_ssh_public_key() {
-    log_section "Clé SSH publique"
+    log_section "SSH public key"
     
     echo ""
-    log_info "Voici votre clé SSH publique:"
+    log_info "Here is your SSH public key:"
     echo ""
     cat "${SSH_KEY_PATH}.pub"
     echo ""
     
-    log_info "Pour ajouter cette clé sur GitHub:"
-    log_step "1. Allez sur https://github.com/settings/keys"
-    log_step "2. Cliquez sur 'New SSH key'"
-    log_step "3. Collez la clé ci-dessus"
+    log_info "To add this key to GitHub:"
+    log_step "1. Go to https://github.com/settings/keys"
+    log_step "2. Click 'New SSH key'"
+    log_step "3. Paste the key above"
     echo ""
     
-    log_info "Pour ajouter cette clé sur GitLab:"
-    log_step "1. Allez sur https://gitlab.com/-/profile/keys"
-    log_step "2. Collez la clé ci-dessus"
+    log_info "To add this key to GitLab:"
+    log_step "1. Go to https://gitlab.com/-/profile/keys"
+    log_step "2. Paste the key above"
     echo ""
 }
 
 ################################################################################
-# Générer une clé GPG
+# Generate GPG key
 ################################################################################
 generate_gpg_key() {
-    log_section "Génération de la clé GPG"
+    log_section "GPG key generation"
     
-    # Vérifier si une clé existe déjà pour cet e-mail
+    # Check if a key already exists for this email
     local existing_keys
     existing_keys=$(gpg --list-keys --with-colons "${USER_EMAIL}" 2>/dev/null | grep -c "^uid" || true)
     
     if [[ "${existing_keys}" -gt 0 ]]; then
-        log_warning "Une clé GPG existe déjà pour ${USER_EMAIL}"
+        log_warning "A GPG key already exists for ${USER_EMAIL}"
         
         if [[ "${NON_INTERACTIVE}" == true ]]; then
-            log_info "Mode non-interactif: utilisation de la clé existante"
+            log_info "Non-interactive mode: using existing key"
             return 0
         fi
         
-        if ! ask "Voulez-vous en générer une nouvelle?"; then
-            log_info "Utilisation de la clé existante"
+        if ! ask "Do you want to generate a new one?"; then
+            log_info "Using existing key"
             return 0
         fi
     fi
     
-    log_step "Génération de la clé GPG (cela peut prendre un moment)..."
+    log_step "Generating GPG key (this may take a moment)..."
     
-    # Créer un fichier de configuration temporaire pour gpg --batch
+    # Create a temporary configuration file for gpg --batch
     local batch_file
     batch_file=$(mktemp)
     
@@ -523,142 +523,142 @@ Expire-Date: 0
 %commit
 EOF
     
-    # Générer la clé
+    # Generate the key
     if gpg --batch --gen-key "${batch_file}" 2>/dev/null; then
-        log_success "Clé GPG générée avec succès"
+        log_success "GPG key generated successfully"
     else
-        log_error "Échec de la génération de la clé GPG"
+        log_error "Failed to generate GPG key"
         rm -f "${batch_file}"
         return 1
     fi
     
-    # Nettoyer le fichier temporaire
+    # Clean up temporary file
     rm -f "${batch_file}"
     
-    # Afficher la clé publique
+    # Display public key
     show_gpg_public_key
     
-    # Proposer de configurer Git
+    # Propose to configure Git
     configure_git_gpg
 }
 
 ################################################################################
-# Afficher la clé GPG publique
+# Display GPG public key
 ################################################################################
 show_gpg_public_key() {
-    log_section "Clé GPG publique"
+    log_section "GPG public key"
     
-    # Récupérer l'ID de la clé
+    # Get key ID
     local gpg_key_id
     gpg_key_id=$(gpg --list-keys --with-colons "${USER_EMAIL}" 2>/dev/null | grep "^fpr" | head -n 1 | cut -d ':' -f 10)
     
     if [[ -z "${gpg_key_id}" ]]; then
-        log_error "Impossible de trouver la clé GPG"
+        log_error "Unable to find GPG key"
         return 1
     fi
     
     echo ""
-    log_info "Voici votre clé GPG publique:"
+    log_info "Here is your GPG public key:"
     echo ""
     gpg --armor --export "${gpg_key_id}"
     echo ""
     
-    log_info "Pour ajouter cette clé sur GitHub:"
-    log_step "1. Allez sur https://github.com/settings/keys"
-    log_step "2. Cliquez sur 'New GPG key'"
-    log_step "3. Collez la clé ci-dessus"
+    log_info "To add this key to GitHub:"
+    log_step "1. Go to https://github.com/settings/keys"
+    log_step "2. Click 'New GPG key'"
+    log_step "3. Paste the key above"
     echo ""
     
-    log_info "Pour ajouter cette clé sur GitLab:"
-    log_step "1. Allez sur https://gitlab.com/-/profile/gpg_keys"
-    log_step "2. Collez la clé ci-dessus"
+    log_info "To add this key to GitLab:"
+    log_step "1. Go to https://gitlab.com/-/profile/gpg_keys"
+    log_step "2. Paste the key above"
     echo ""
 }
 
 ################################################################################
-# Configurer Git pour utiliser GPG
+# Configure Git to use GPG
 ################################################################################
 configure_git_gpg() {
     if [[ "${NON_INTERACTIVE}" == false ]]; then
-        if ! ask "Voulez-vous configurer Git pour signer vos commits avec GPG?"; then
+        if ! ask "Do you want to configure Git to sign your commits with GPG?"; then
             return 0
         fi
     fi
     
-    log_step "Configuration de Git pour GPG..."
+    log_step "Configuring Git for GPG..."
     
-    # Récupérer l'ID de la clé
+    # Get key ID
     local gpg_key_id
     gpg_key_id=$(gpg --list-keys --with-colons "${USER_EMAIL}" 2>/dev/null | grep "^fpr" | head -n 1 | cut -d ':' -f 10)
     
     if [[ -z "${gpg_key_id}" ]]; then
-        log_error "Impossible de trouver la clé GPG"
+        log_error "Unable to find GPG key"
         return 1
     fi
     
-    # Configurer Git
+    # Configure Git
     git config --global user.signingkey "${gpg_key_id}"
     git config --global commit.gpgsign true
     
-    log_success "Git configuré pour signer les commits avec la clé GPG"
+    log_success "Git configured to sign commits with GPG key"
 }
 
 ################################################################################
-# Configurer Git (user.name et user.email)
+# Configure Git (user.name and user.email)
 ################################################################################
 configure_git_user() {
-    log_section "Configuration de Git"
+    log_section "Git configuration"
     
-    # Vérifier la configuration actuelle
+    # Check current configuration
     local current_name
     current_name=$(git config --global user.name 2>/dev/null || echo "")
     
     local current_email
     current_email=$(git config --global user.email 2>/dev/null || echo "")
     
-    # Configurer le nom si nécessaire
+    # Configure name if needed
     if [[ -z "${current_name}" ]] && [[ -n "${USER_NAME}" ]]; then
         git config --global user.name "${USER_NAME}"
-        log_success "Git user.name configuré: ${USER_NAME}"
+        log_success "Git user.name configured: ${USER_NAME}"
     elif [[ -n "${current_name}" ]]; then
-        log_info "Git user.name déjà configuré: ${current_name}"
+        log_info "Git user.name already configured: ${current_name}"
     fi
     
-    # Configurer l'e-mail si nécessaire
+    # Configure email if needed
     if [[ -z "${current_email}" ]] && [[ -n "${USER_EMAIL}" ]]; then
         git config --global user.email "${USER_EMAIL}"
-        log_success "Git user.email configuré: ${USER_EMAIL}"
+        log_success "Git user.email configured: ${USER_EMAIL}"
     elif [[ -n "${current_email}" ]]; then
-        log_info "Git user.email déjà configuré: ${current_email}"
+        log_info "Git user.email already configured: ${current_email}"
     fi
 }
 
 ################################################################################
-# Fonction principale
+# Main function
 ################################################################################
 main() {
-    print_banner "Configuration des clés SSH et GPG"
+    print_banner "SSH and GPG Keys Setup"
     
-    # Parser les arguments
+    # Parse arguments
     parse_arguments "$@"
     
-    # Vérifier les dépendances
+    # Check dependencies
     check_dependencies
     
-    # Collecter les informations utilisateur
+    # Collect user information
     collect_user_info
     
-    # Générer la clé SSH
+    # Generate SSH key
     if [[ "${GENERATE_SSH}" == true ]]; then
         generate_ssh_key
     fi
     
-    # Générer la clé GPG
+    # Generate GPG key
     if [[ "${GENERATE_GPG}" == true ]]; then
         if [[ -z "${USER_NAME}" ]]; then
-            log_warning "Le nom est requis pour générer une clé GPG"
+            log_warning "Name is required to generate a GPG key"
             if [[ "${NON_INTERACTIVE}" == false ]]; then
-                read -r -p "Entrez votre nom complet: " name_input
+                read -r -p "Enter your full name: " name_input
                 USER_NAME=$(sanitize_string "${name_input}")
             fi
         fi
@@ -666,22 +666,22 @@ main() {
         if [[ -n "${USER_NAME}" ]]; then
             generate_gpg_key
         else
-            log_warning "Génération de la clé GPG ignorée (nom manquant)"
+            log_warning "GPG key generation skipped (missing name)"
         fi
     fi
     
-    # Configurer Git
+    # Configure Git
     configure_git_user
     
-    # Message final
+    # Final message
     echo ""
-    log_section "Configuration terminée"
-    log_success "Vos clés ont été générées avec succès!"
+    log_section "Setup complete"
+    log_success "Your keys have been generated successfully!"
     echo ""
-    log_info "N'oubliez pas d'ajouter vos clés publiques sur GitHub/GitLab"
-    log_info "et de tester votre connexion SSH avec: ssh -T git@github.com"
+    log_info "Don't forget to add your public keys to GitHub/GitLab"
+    log_info "and test your SSH connection with: ssh -T git@github.com"
     echo ""
 }
 
-# Exécuter le script
+# Execute the script
 main "$@"

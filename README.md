@@ -280,7 +280,6 @@ dotfiles/
 - **Configuration Protection**: All modules detect existing configuration files and prompt before overwriting
 - Timestamped backups created automatically (when chosen)
 - User confirmation required for destructive operations
-- User confirmation required for destructive operations
 
 ## Troubleshooting
 

@@ -83,7 +83,7 @@ create_starship_config() {
     
     ensure_directory "${config_dir}"
     
-    # Use safe_write_config to handle existing files
+    # Prompt user if config already exists
     if ! prompt_config_overwrite "${starship_config}" "Starship configuration"; then
         return 0
     fi

@@ -123,6 +123,9 @@ die() {
 
 ################################################################################
 # Array to track failed operations
+# Note: This array is initialized when logger.sh is sourced and persists
+# throughout the script execution. It accumulates failures across all
+# installation attempts and is reset only when the script exits.
 ################################################################################
 declare -a FAILED_OPERATIONS=()
 

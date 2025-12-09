@@ -20,9 +20,14 @@ install_nvm() {
     
     if [[ -d "${NVM_DIR}" ]] && [[ -s "${NVM_DIR}/nvm.sh" ]]; then
         log_success "NVM is already installed"
+        
+        # Temporarily disable 'set -u' to prevent issues with unbound variables in nvm.sh
+        set +u
         source "${NVM_DIR}/nvm.sh"
+        set -u
+        
         local nvm_version
-        nvm_version=$(nvm --version)
+        nvm_version=$(nvm --version 2>/dev/null || echo "unknown")
         log_info "NVM version: ${nvm_version}"
         
         if confirm "Would you like to install the latest LTS version of Node.js?"; then
@@ -38,9 +43,11 @@ install_nvm() {
     bash /tmp/nvm-install.sh
     rm -f /tmp/nvm-install.sh
     
-    # Load NVM
+    # Load NVM - temporarily disable 'set -u' to prevent issues with unbound variables
     export NVM_DIR="${HOME}/.nvm"
+    set +u
     [ -s "${NVM_DIR}/nvm.sh" ] && source "${NVM_DIR}/nvm.sh"
+    set -u
     
     if command -v nvm >/dev/null 2>&1; then
         log_success "NVM installed successfully"
@@ -62,16 +69,19 @@ install_nvm() {
 install_node_lts() {
     log_step "Installing Node.js LTS version..."
     
+    # Temporarily disable 'set -u' for nvm commands
+    set +u
     nvm install --lts
     nvm use --lts
     nvm alias default 'lts/*'
+    set -u
     
     local node_version
-    node_version=$(node --version)
+    node_version=$(node --version 2>/dev/null || echo "unknown")
     log_success "Node.js ${node_version} installed"
     
     local npm_version
-    npm_version=$(npm --version)
+    npm_version=$(npm --version 2>/dev/null || echo "unknown")
     log_info "npm version: ${npm_version}"
     
     # Install pnpm for better package management

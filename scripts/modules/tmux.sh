@@ -13,9 +13,20 @@ install_tmux() {
         tmux_version=$(tmux -V | awk '{print $2}')
         log_success "Tmux is already installed (version ${tmux_version})"
         
-        if confirm "Would you like to configure tmux?"; then
+        if [[ "${DRY_RUN:-false}" == true ]]; then
+            log_dry_run "Would prompt to configure tmux"
+            configure_tmux
+        elif confirm "Would you like to configure tmux?"; then
             configure_tmux
         fi
+        return 0
+    fi
+    
+    if [[ "${DRY_RUN:-false}" == true ]]; then
+        log_dry_run "Would install Tmux:"
+        log_dry_run "  - Install tmux package"
+        log_dry_run "  - Create custom ~/.tmux.conf configuration"
+        log_dry_run "  - Enable mouse support and custom key bindings"
         return 0
     fi
     
@@ -44,6 +55,12 @@ install_tmux() {
 ################################################################################
 configure_tmux() {
     local tmux_conf="${HOME}/.tmux.conf"
+    
+    if [[ "${DRY_RUN:-false}" == true ]]; then
+        log_dry_run "Would create Tmux configuration at: ${tmux_conf}"
+        log_dry_run "Would configure mouse support, custom key bindings, and status bar"
+        return 0
+    fi
     
     log_step "Configuring Tmux..."
     

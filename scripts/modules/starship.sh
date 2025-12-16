@@ -13,9 +13,20 @@ install_starship() {
         starship_version=$(starship --version | awk '{print $2}')
         log_success "Starship is already installed (version ${starship_version})"
         
-        if confirm "Would you like to configure Starship?"; then
+        if [[ "${DRY_RUN:-false}" == true ]]; then
+            log_dry_run "Would prompt to configure Starship"
+            configure_starship
+        elif confirm "Would you like to configure Starship?"; then
             configure_starship
         fi
+        return 0
+    fi
+    
+    if [[ "${DRY_RUN:-false}" == true ]]; then
+        log_dry_run "Would install Starship prompt:"
+        log_dry_run "  - Download and run Starship installation script"
+        log_dry_run "  - Configure shell integration (bash/zsh)"
+        log_dry_run "  - Create custom Starship configuration"
         return 0
     fi
     
@@ -42,6 +53,13 @@ install_starship() {
 # Configure Starship
 ################################################################################
 configure_starship() {
+    if [[ "${DRY_RUN:-false}" == true ]]; then
+        log_dry_run "Would configure Starship prompt:"
+        log_dry_run "  - Add Starship initialization to shell config"
+        log_dry_run "  - Create custom Starship configuration at ~/.config/starship.toml"
+        return 0
+    fi
+    
     local shell_rc
     shell_rc="$(get_shell_rc)"
     local shell_name

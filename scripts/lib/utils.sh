@@ -40,6 +40,15 @@ require_root() {
 #   $@ - Command and arguments
 ################################################################################
 run_as_root() {
+    if [[ "${DRY_RUN:-false}" == true ]]; then
+        if is_root; then
+            log_dry_run "Would execute: $*"
+        else
+            log_dry_run "Would execute with sudo: $*"
+        fi
+        return 0
+    fi
+    
     if is_root; then
         "$@"
     else
@@ -56,6 +65,13 @@ run_as_root() {
 ################################################################################
 confirm() {
     local question="$1"
+    
+    # In dry-run mode, always return yes to show all potential actions
+    if [[ "${DRY_RUN:-false}" == true ]]; then
+        log_dry_run "Would prompt: ${question}"
+        return 0
+    fi
+    
     local response
     
     read -r -p "${question} [y/N] " response
@@ -78,8 +94,12 @@ ensure_directory() {
     local dir="$1"
     
     if [[ ! -d "${dir}" ]]; then
-        log_step "Creating directory: ${dir}"
-        mkdir -p "${dir}"
+        if [[ "${DRY_RUN:-false}" == true ]]; then
+            log_dry_run "Would create directory: ${dir}"
+        else
+            log_step "Creating directory: ${dir}"
+            mkdir -p "${dir}"
+        fi
     fi
 }
 
@@ -93,8 +113,12 @@ backup_file() {
     
     if [[ -e "${file}" ]]; then
         local backup="${file}.backup.$(date +%Y%m%d_%H%M%S)"
-        log_step "Backing up ${file} to ${backup}"
-        cp -r "${file}" "${backup}"
+        if [[ "${DRY_RUN:-false}" == true ]]; then
+            log_dry_run "Would backup ${file} to ${backup}"
+        else
+            log_step "Backing up ${file} to ${backup}"
+            cp -r "${file}" "${backup}"
+        fi
     fi
 }
 
@@ -112,6 +136,13 @@ prompt_config_overwrite() {
     
     if [[ ! -e "${config_file}" ]]; then
         return 0  # File doesn't exist, safe to create
+    fi
+    
+    # In dry-run mode, just log what would be done
+    if [[ "${DRY_RUN:-false}" == true ]]; then
+        log_dry_run "Would check if ${description} exists at: ${config_file}"
+        log_dry_run "Would prompt user for action (backup/skip/overwrite)"
+        return 0  # Always proceed in dry-run
     fi
     
     log_warning "${description} already exists at: ${config_file}"
@@ -163,6 +194,13 @@ safe_write_config() {
         return 1
     fi
     
+    # In dry-run mode, just log what would be done
+    if [[ "${DRY_RUN:-false}" == true ]]; then
+        log_dry_run "Would create parent directory: $(dirname "${config_file}")"
+        log_dry_run "Would write ${description} to: ${config_file}"
+        return 0
+    fi
+    
     # Create parent directory if needed
     ensure_directory "$(dirname "${config_file}")"
     
@@ -189,6 +227,11 @@ download_file() {
     local url="$1"
     local output="$2"
     
+    if [[ "${DRY_RUN:-false}" == true ]]; then
+        log_dry_run "Would download ${url} to ${output}"
+        return 0
+    fi
+    
     log_step "Downloading ${url}"
     
     if command_exists curl; then
@@ -211,8 +254,12 @@ add_line_to_file() {
     local file="$2"
     
     if ! grep -qF "${line}" "${file}" 2>/dev/null; then
-        echo "${line}" >> "${file}"
-        log_step "Added line to ${file}"
+        if [[ "${DRY_RUN:-false}" == true ]]; then
+            log_dry_run "Would add line to ${file}: ${line}"
+        else
+            echo "${line}" >> "${file}"
+            log_step "Added line to ${file}"
+        fi
     fi
 }
 
@@ -253,6 +300,11 @@ get_shell_rc() {
 ################################################################################
 install_package() {
     local package="$1"
+    
+    if [[ "${DRY_RUN:-false}" == true ]]; then
+        log_dry_run "Would install package: ${package} using ${PACKAGE_MANAGER}"
+        return 0
+    fi
     
     log_step "Installing package: ${package}"
     

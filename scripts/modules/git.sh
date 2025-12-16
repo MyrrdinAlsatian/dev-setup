@@ -13,9 +13,18 @@ install_git() {
         git_version=$(git --version | awk '{print $3}')
         log_success "Git is already installed (version ${git_version})"
         
-        if confirm "Would you like to configure Git?"; then
+        if [[ "${DRY_RUN:-false}" == true ]]; then
+            log_dry_run "Would prompt to configure Git"
+            configure_git
+        elif confirm "Would you like to configure Git?"; then
             configure_git
         fi
+        return 0
+    fi
+    
+    if [[ "${DRY_RUN:-false}" == true ]]; then
+        log_dry_run "Would install Git using package manager: ${PACKAGE_MANAGER}"
+        log_dry_run "Would configure Git with user name and email"
         return 0
     fi
     
@@ -52,6 +61,17 @@ install_git() {
 # Configure Git
 ################################################################################
 configure_git() {
+    if [[ "${DRY_RUN:-false}" == true ]]; then
+        log_dry_run "Would configure Git settings:"
+        log_dry_run "  - Set user name and email (if not already set)"
+        log_dry_run "  - Set default branch to 'main'"
+        log_dry_run "  - Configure Git aliases (co, br, ci, st, etc.)"
+        log_dry_run "  - Set pull.rebase to false"
+        log_dry_run "  - Enable color output"
+        log_dry_run "  - Configure credential helper based on OS"
+        return 0
+    fi
+    
     log_step "Configuring Git..."
     
     # Get user name

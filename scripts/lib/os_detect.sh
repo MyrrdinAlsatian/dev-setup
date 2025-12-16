@@ -24,7 +24,7 @@ detect_os() {
     if [[ "$OSTYPE" == "linux-gnu"* ]]; then
         OS_TYPE="linux"
         detect_linux_distro
-        detect_wsl
+        detect_wsl || true  # Don't fail if not WSL
     elif [[ "$OSTYPE" == "darwin"* ]]; then
         OS_TYPE="macos"
         OS_DISTRO="darwin"

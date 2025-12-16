@@ -16,6 +16,17 @@ DOTFILES_SYMLINK_PATTERN="/.dotfiles/"
 # Setup dotfiles
 ################################################################################
 setup_dotfiles() {
+    if [[ "${DRY_RUN:-false}" == true ]]; then
+        log_dry_run "Would setup dotfiles management:"
+        log_dry_run "  - Install GNU Stow (if not already installed)"
+        log_dry_run "  - Prompt for dotfiles repository URL"
+        log_dry_run "  - Clone or update dotfiles repository to ~/.dotfiles"
+        log_dry_run "  - Detect conflicts with existing configuration files"
+        log_dry_run "  - Prompt for each conflict (backup/skip/overwrite)"
+        log_dry_run "  - Apply dotfiles using GNU Stow"
+        return 0
+    fi
+    
     log_info "Setting up dotfiles management..."
     
     # Check if stow is installed

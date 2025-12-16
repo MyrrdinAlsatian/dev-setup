@@ -33,6 +33,9 @@ REMOTE_HOST=""
 SKIP_TOOLS=false
 SKIP_DOTFILES=false
 
+# Export DRY_RUN so it's available in sourced modules
+export DRY_RUN
+
 # Source core libraries
 source "${LIB_DIR}/logger.sh"
 source "${LIB_DIR}/os_detect.sh"
@@ -168,8 +171,23 @@ main() {
     # Print banner
     print_banner "Dev Environment Setup"
     
+    # Show dry-run banner if enabled
+    if [[ "${DRY_RUN}" == true ]]; then
+        print_dry_run_banner
+        log_warning "DRY-RUN MODE: No changes will be made to your system"
+        log_info "This mode shows what would be executed during a real setup"
+        echo ""
+    fi
+    
     # Handle remote deployment
     if [[ -n "${REMOTE_HOST}" ]]; then
+        if [[ "${DRY_RUN}" == true ]]; then
+            log_dry_run "Would deploy to remote host: ${REMOTE_HOST}"
+            log_dry_run "Would create temporary directory on remote host"
+            log_dry_run "Would copy setup scripts to remote host"
+            log_dry_run "Would execute setup on remote host"
+            exit 0
+        fi
         deploy_remote "${REMOTE_HOST}"
         exit 0
     fi
@@ -202,6 +220,11 @@ main() {
     # Install tools
     if [[ "${SKIP_TOOLS}" != true ]]; then
         log_section "Tool Installation"
+        
+        if [[ "${DRY_RUN}" == true ]]; then
+            log_info "The following tools would be installed/configured:"
+            echo ""
+        fi
         
         source "${MODULES_DIR}/git.sh"
         safe_install install_git "Git" || true
@@ -241,17 +264,24 @@ main() {
     fi
     
     # Print failure summary if any operations failed
-    print_failure_summary
+    if [[ "${DRY_RUN}" != true ]]; then
+        print_failure_summary
+    fi
     
     # Final summary
     log_section "Setup Complete"
-    if [[ ${#FAILED_OPERATIONS[@]} -eq 0 ]]; then
+    if [[ "${DRY_RUN}" == true ]]; then
+        log_success "Dry-run completed successfully!"
+        log_info "Run without --dry-run to perform the actual setup"
+    elif [[ ${#FAILED_OPERATIONS[@]} -eq 0 ]]; then
         log_success "Development environment setup completed successfully!"
     else
         log_warning "Development environment setup completed with some errors."
         log_info "Please review the Installation Summary above."
     fi
-    log_info "Please restart your shell or run: source ~/.bashrc (or ~/.zshrc)"
+    if [[ "${DRY_RUN}" != true ]]; then
+        log_info "Please restart your shell or run: source ~/.bashrc (or ~/.zshrc)"
+    fi
 }
 
 # Run main function

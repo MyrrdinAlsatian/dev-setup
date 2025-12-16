@@ -25,8 +25,8 @@ install_uv_cli_tools() {
     fi
     
     # Mode dry-run
-    if [[ "${DRY_RUN}" == true ]]; then
-        log_info "[DRY RUN] Exécuterait: uv tool install specify-cli --from git+https://github.com/github/spec-kit.git"
+    if [[ "${DRY_RUN:-false}" == true ]]; then
+        log_dry_run "Would execute: uv tool install specify-cli --from git+https://github.com/github/spec-kit.git"
         return 0
     fi
     

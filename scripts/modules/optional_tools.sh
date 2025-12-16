@@ -26,6 +26,7 @@ enable_universe_repo() {
     fi
     
     if [[ "${PACKAGE_MANAGER}" != "apt" ]]; then
+        # Not applicable for non-apt package managers
         return 0
     fi
     

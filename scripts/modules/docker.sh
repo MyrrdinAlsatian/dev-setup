@@ -13,13 +13,18 @@ install_docker() {
         docker_version=$(docker --version | awk '{print $3}' | sed 's/,//')
         log_success "Docker is already installed (version ${docker_version})"
         
-        if ! docker ps >/dev/null 2>&1; then
+        if [[ "${DRY_RUN:-false}" == true ]]; then
+            if ! docker ps >/dev/null 2>&1; then
+                log_dry_run "Would check Docker daemon status and permissions"
+                log_dry_run "Would prompt: Would you like to configure Docker permissions?"
+            else
+                log_dry_run "Docker is already installed and running"
+            fi
+        elif ! docker ps >/dev/null 2>&1; then
             log_warning "Docker daemon is not running or you don't have permission"
             if confirm "Would you like to configure Docker permissions?"; then
                 configure_docker_permissions
             fi
-        elif [[ "${DRY_RUN:-false}" == true ]]; then
-            log_dry_run "Docker is already installed and running"
         fi
         return 0
     fi

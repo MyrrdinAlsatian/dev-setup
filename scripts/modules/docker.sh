@@ -39,9 +39,8 @@ install_docker() {
         elif is_macos; then
             log_dry_run "  - Install Docker Desktop via Homebrew"
         else
-            log_error "Docker installation not supported on this OS via this script"
-            log_info "Please install Docker Desktop manually from https://www.docker.com/products/docker-desktop"
-            return 1
+            log_warning "Docker installation not supported on this OS via this script"
+            log_info "In actual run, you would need to install Docker Desktop manually from https://www.docker.com/products/docker-desktop"
         fi
         return 0
     fi

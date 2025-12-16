@@ -22,6 +22,23 @@ install_docker() {
         return 0
     fi
     
+    if [[ "${DRY_RUN:-false}" == true ]]; then
+        log_dry_run "Would install Docker:"
+        if is_linux; then
+            log_dry_run "  - Install Docker Engine for Linux"
+            log_dry_run "  - Configure Docker repository"
+            log_dry_run "  - Start and enable Docker service"
+            log_dry_run "  - Add user to docker group"
+        elif is_macos; then
+            log_dry_run "  - Install Docker Desktop via Homebrew"
+        else
+            log_error "Docker installation not supported on this OS via this script"
+            log_info "Please install Docker Desktop manually from https://www.docker.com/products/docker-desktop"
+            return 1
+        fi
+        return 0
+    fi
+    
     log_step "Installing Docker..."
     
     if is_linux; then
@@ -104,6 +121,11 @@ install_docker_rhel() {
 # Install Docker on macOS
 ################################################################################
 install_docker_macos() {
+    if [[ "${DRY_RUN:-false}" == true ]]; then
+        log_dry_run "Would install Docker Desktop on macOS via Homebrew"
+        return 0
+    fi
+    
     log_step "Installing Docker on macOS..."
     
     if command_exists brew; then
@@ -121,6 +143,11 @@ install_docker_macos() {
 ################################################################################
 configure_docker_permissions() {
     if is_linux; then
+        if [[ "${DRY_RUN:-false}" == true ]]; then
+            log_dry_run "Would configure Docker permissions (add user to docker group)"
+            return 0
+        fi
+        
         log_step "Configuring Docker permissions..."
         
         # Add user to docker group

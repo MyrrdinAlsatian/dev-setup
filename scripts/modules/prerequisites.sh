@@ -35,7 +35,10 @@ check_prerequisites() {
             log_error "  - ${tool}"
         done
         
-        if confirm "Would you like to install missing tools?"; then
+        if [[ "${DRY_RUN:-false}" == true ]]; then
+            log_dry_run "Would prompt to install missing tools: ${missing_tools[*]}"
+            log_dry_run "Would install prerequisites"
+        elif confirm "Would you like to install missing tools?"; then
             install_prerequisites "${missing_tools[@]}"
         else
             die "Cannot proceed without required tools"
@@ -73,6 +76,14 @@ check_tool() {
 ################################################################################
 install_prerequisites() {
     local tools=("$@")
+    
+    if [[ "${DRY_RUN:-false}" == true ]]; then
+        log_dry_run "Would install the following prerequisites:"
+        for tool in "${tools[@]}"; do
+            log_dry_run "  - ${tool}"
+        done
+        return 0
+    fi
     
     log_step "Installing prerequisites..."
     

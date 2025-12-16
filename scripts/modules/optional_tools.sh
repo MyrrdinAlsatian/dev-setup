@@ -29,6 +29,11 @@ enable_universe_repo() {
         return 0
     fi
     
+    if [[ "${DRY_RUN:-false}" == true ]]; then
+        log_dry_run "Would enable Universe repository on Ubuntu/Debian"
+        return 0
+    fi
+    
     log_step "Enabling Universe repository..."
     
     # Check if universe is already enabled
@@ -551,6 +556,22 @@ install_optional_tools() {
     log_section "Optional Development Tools"
     log_info "Installing optional but useful development tools"
     log_info "These tools are not required but recommended for development"
+    
+    if [[ "${DRY_RUN:-false}" == true ]]; then
+        log_dry_run "Would prompt to install optional tools:"
+        log_dry_run "  - Fira Code Nerd Font"
+        log_dry_run "  - jq (JSON processor)"
+        log_dry_run "  - yq (YAML processor)"
+        log_dry_run "  - make (build tool)"
+        log_dry_run "  - Tabby or Alacritty terminal"
+        log_dry_run "  - ffmpeg (media processing)"
+        log_dry_run "  - imagemagick (image processing)"
+        log_dry_run "  - jpegoptim and optipng (image optimization)"
+        log_dry_run "  - mkcert (local HTTPS certificates)"
+        log_dry_run "  - DBeaver (database GUI tool)"
+        log_dry_run "  - PostgreSQL client tools"
+        return 0
+    fi
     
     # Enable universe repository (Ubuntu/Debian only)
     enable_universe_repo

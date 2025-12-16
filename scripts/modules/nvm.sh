@@ -13,7 +13,7 @@ NVM_DIR="${HOME}/.nvm"
 install_nvm() {
     # Unset NPM_CONFIG_PREFIX to avoid nvm incompatibility
     # Reference: nvm is not compatible with the NPM_CONFIG_PREFIX environment variable
-    if [ -n "$NPM_CONFIG_PREFIX" ]; then
+    if [[ -n "${NPM_CONFIG_PREFIX:-}" ]]; then
         unset NPM_CONFIG_PREFIX
         log_info "Unset NPM_CONFIG_PREFIX to allow nvm to work correctly"
     fi
@@ -33,6 +33,16 @@ install_nvm() {
         if confirm "Would you like to install the latest LTS version of Node.js?"; then
             install_node_lts
         fi
+        return 0
+    fi
+    
+    if [[ "${DRY_RUN:-false}" == true ]]; then
+        log_dry_run "Would install NVM:"
+        log_dry_run "  - Download NVM installation script (version ${NVM_VERSION})"
+        log_dry_run "  - Install NVM to ${NVM_DIR}"
+        log_dry_run "  - Configure shell integration"
+        log_dry_run "  - Install latest LTS version of Node.js"
+        log_dry_run "  - Install pnpm package manager"
         return 0
     fi
     
@@ -67,6 +77,12 @@ install_nvm() {
 # Install Node.js LTS version
 ################################################################################
 install_node_lts() {
+    if [[ "${DRY_RUN:-false}" == true ]]; then
+        log_dry_run "Would install Node.js LTS version using nvm"
+        log_dry_run "Would install pnpm package manager"
+        return 0
+    fi
+    
     log_step "Installing Node.js LTS version..."
     
     # Temporarily disable 'set -u' for nvm commands
@@ -92,6 +108,11 @@ install_node_lts() {
 # Install pnpm package manager
 ################################################################################
 install_pnpm() {
+    if [[ "${DRY_RUN:-false}" == true ]]; then
+        log_dry_run "Would install pnpm via corepack or npm"
+        return 0
+    fi
+    
     log_step "Installing pnpm package manager..."
     
     # Try corepack first (preferred method for pnpm installation)

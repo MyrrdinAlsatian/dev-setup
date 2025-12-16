@@ -19,6 +19,14 @@ install_tmux() {
         return 0
     fi
     
+    if [[ "${DRY_RUN:-false}" == true ]]; then
+        log_dry_run "Would install Tmux:"
+        log_dry_run "  - Install tmux package"
+        log_dry_run "  - Create custom ~/.tmux.conf configuration"
+        log_dry_run "  - Enable mouse support and custom key bindings"
+        return 0
+    fi
+    
     log_step "Installing Tmux..."
     
     if is_macos; then
@@ -44,6 +52,12 @@ install_tmux() {
 ################################################################################
 configure_tmux() {
     local tmux_conf="${HOME}/.tmux.conf"
+    
+    if [[ "${DRY_RUN:-false}" == true ]]; then
+        log_dry_run "Would create Tmux configuration at: ${tmux_conf}"
+        log_dry_run "Would configure mouse support, custom key bindings, and status bar"
+        return 0
+    fi
     
     log_step "Configuring Tmux..."
     

@@ -81,6 +81,15 @@ log_step() {
 }
 
 ################################################################################
+# Log a dry-run action (what would be executed)
+# Arguments:
+#   $1 - Message
+################################################################################
+log_dry_run() {
+    print_color "${COLOR_YELLOW}" "[DRY-RUN] $1"
+}
+
+################################################################################
 # Print a section header
 # Arguments:
 #   $1 - Section title
@@ -105,6 +114,21 @@ print_banner() {
     printf "${COLOR_BOLD}${COLOR_CYAN}║  %-59s  ║${COLOR_RESET}\n" "$1"
     print_color "${COLOR_BOLD}${COLOR_CYAN}" "║                                                               ║"
     print_color "${COLOR_BOLD}${COLOR_CYAN}" "╚═══════════════════════════════════════════════════════════════╝"
+    echo ""
+}
+
+################################################################################
+# Print a dry-run banner
+################################################################################
+print_dry_run_banner() {
+    echo ""
+    print_color "${COLOR_BOLD}${COLOR_YELLOW}" "╔═══════════════════════════════════════════════════════════════╗"
+    print_color "${COLOR_BOLD}${COLOR_YELLOW}" "║                                                               ║"
+    print_color "${COLOR_BOLD}${COLOR_YELLOW}" "║                      🔍 DRY-RUN MODE 🔍                       ║"
+    print_color "${COLOR_BOLD}${COLOR_YELLOW}" "║                                                               ║"
+    print_color "${COLOR_BOLD}${COLOR_YELLOW}" "║  This is a preview - no changes will be made to your system  ║"
+    print_color "${COLOR_BOLD}${COLOR_YELLOW}" "║                                                               ║"
+    print_color "${COLOR_BOLD}${COLOR_YELLOW}" "╚═══════════════════════════════════════════════════════════════╝"
     echo ""
 }
 

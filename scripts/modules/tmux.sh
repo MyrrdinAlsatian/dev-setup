@@ -13,7 +13,10 @@ install_tmux() {
         tmux_version=$(tmux -V | awk '{print $2}')
         log_success "Tmux is already installed (version ${tmux_version})"
         
-        if confirm "Would you like to configure tmux?"; then
+        if [[ "${DRY_RUN:-false}" == true ]]; then
+            log_dry_run "Would prompt to configure tmux"
+            configure_tmux
+        elif confirm "Would you like to configure tmux?"; then
             configure_tmux
         fi
         return 0

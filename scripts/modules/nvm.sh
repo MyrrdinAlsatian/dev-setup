@@ -30,7 +30,10 @@ install_nvm() {
         nvm_version=$(nvm --version 2>/dev/null || echo "unknown")
         log_info "NVM version: ${nvm_version}"
         
-        if confirm "Would you like to install the latest LTS version of Node.js?"; then
+        if [[ "${DRY_RUN:-false}" == true ]]; then
+            log_dry_run "Would prompt: Would you like to install the latest LTS version of Node.js?"
+            install_node_lts
+        elif confirm "Would you like to install the latest LTS version of Node.js?"; then
             install_node_lts
         fi
         return 0

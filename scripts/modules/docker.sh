@@ -18,6 +18,8 @@ install_docker() {
             if confirm "Would you like to configure Docker permissions?"; then
                 configure_docker_permissions
             fi
+        elif [[ "${DRY_RUN:-false}" == true ]]; then
+            log_dry_run "Docker is already installed and running"
         fi
         return 0
     fi

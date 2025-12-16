@@ -13,7 +13,10 @@ install_starship() {
         starship_version=$(starship --version | awk '{print $2}')
         log_success "Starship is already installed (version ${starship_version})"
         
-        if confirm "Would you like to configure Starship?"; then
+        if [[ "${DRY_RUN:-false}" == true ]]; then
+            log_dry_run "Would prompt to configure Starship"
+            configure_starship
+        elif confirm "Would you like to configure Starship?"; then
             configure_starship
         fi
         return 0
